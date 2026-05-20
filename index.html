@@ -379,6 +379,7 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
   background-color:#07111F;
   transition:transform .9s var(--ease);
   will-change:transform;
+  cursor:zoom-in;
 }
 .vcard:hover .vcard-photo{transform:scale(1.04)}
 
@@ -1135,13 +1136,24 @@ footer{
 
 @media(max-width:500px){
   #sc-chat-box{
-    right:10px;left:10px;width:auto;
-    bottom:86px;
-    height:460px;
-    max-height:58vh;
-    border-radius:14px;
+    right:0;left:0;width:100%;
+    bottom:0;
+    height:auto;
+    max-height:100%;
+    border-radius:16px 16px 0 0;
+    border-left:none;border-right:none;border-bottom:none;
+  }
+  #sc-chat-box.open{
+    display:flex;
+  }
+  #sc-chat-msgs{
+    min-height:220px;
+    flex:1;
   }
   #sc-chat-btn{bottom:20px;right:16px;width:56px;height:56px}
+  #sc-chat-input-area{
+    padding-bottom:calc(14px + env(safe-area-inset-bottom));
+  }
 }
 #sc-chat-input{font-size:16px}
 </style>
@@ -1169,6 +1181,7 @@ footer{
       <p>Asesor virtual · Ushuaia, Tierra del Fuego</p>
     </div>
     <div class="sc-online" title="En línea"></div>
+    <button id="sc-chat-close" aria-label="Cerrar chat" style="margin-left:auto;background:none;border:none;color:rgba(245,247,250,.4);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1;transition:color .2s" onmouseenter="this.style.color='rgba(245,247,250,.9)'" onmouseleave="this.style.color='rgba(245,247,250,.4)'">✕</button>
   </div>
 
   <div id="sc-chat-msgs"></div>
@@ -1186,6 +1199,7 @@ footer{
   const msgs         = document.getElementById('sc-chat-msgs');
   const input        = document.getElementById('sc-chat-input');
   const send         = document.getElementById('sc-chat-send');
+  const closeBtn     = document.getElementById('sc-chat-close');
   const tooltip      = document.getElementById('sc-tooltip');
   const tooltipClose = document.getElementById('sc-tooltip-close');
   const WA           = '5492901606291';
@@ -1200,6 +1214,12 @@ footer{
     setTimeout(() => tooltip.classList.remove('show'), 5000);
   }, 10000);
 
+  closeBtn.addEventListener('click', () => {
+    box.classList.remove('open');
+    btn.style.display = '';
+    resetChatPosition();
+  });
+
   tooltipClose.addEventListener('click', e => {
     e.stopPropagation();
     tooltip.classList.remove('show');
@@ -1210,18 +1230,58 @@ footer{
     tooltip.classList.remove('show');
     clearTimeout(tooltipTimer);
     const open = box.classList.toggle('open');
+    btn.style.display = (open && isMobile()) ? 'none' : '';
     if(open && !initiated){
       initiated = true;
       botMsg(`👋 Hola! Bienvenido a <b>JS Select Cars</b>.<br><br>Soy tu asesor virtual 🚘<br><br>Te puedo ayudar con:<br>• Compra de vehículos<br>• Permutas<br>• Financiación<br>• Disponibilidad y precios<br><br>¿Cómo te llamás?`);
       step = 'nombre';
     }
-    if(open) input.focus();
+    if(open){ input.focus(); if(isMobile()) setTimeout(adjustChatForKeyboard,200); }
   };
+
+  // ── MOBILE KEYBOARD FIX: pegamos el chat al teclado con visualViewport
+  function isMobile(){ return window.innerWidth <= 500; }
+
+  function adjustChatForKeyboard(){
+    if(!isMobile() || !box.classList.contains('open')) return;
+    const vv = window.visualViewport;
+    if(!vv) return;
+    // Altura disponible = lo que ve el usuario
+    const availH = vv.height;
+    // Offset desde arriba del viewport visual al top del viewport de layout
+    const offsetTop = vv.offsetTop;
+    box.style.top = offsetTop + 'px';
+    box.style.height = availH + 'px';
+    box.style.bottom = '';
+    // Scroll mensajes al final
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function resetChatPosition(){
+    if(!isMobile()) return;
+    box.style.top = '';
+    box.style.height = '';
+    box.style.bottom = '';
+  }
+
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', adjustChatForKeyboard);
+    window.visualViewport.addEventListener('scroll', adjustChatForKeyboard);
+  }
+
+  input.addEventListener('focus', () => {
+    if(isMobile()) setTimeout(adjustChatForKeyboard, 100);
+  });
+  input.addEventListener('blur', () => {
+    if(isMobile()) setTimeout(resetChatPosition, 100);
+  });
 
   // Cerrar al click fuera del chat
   document.addEventListener('click', (e) => {
     if(box.classList.contains('open') && !box.contains(e.target) && !btn.contains(e.target)){
       box.classList.remove('open');
+      btn.style.display = '';
+      resetChatPosition();
     }
   });
   box.addEventListener('click', (e) => e.stopPropagation());
@@ -1632,7 +1692,14 @@ footer{
 <div id="vmodal">
   <div id="vmodal-backdrop" onclick="closeModal()"></div>
   <div id="vmodal-box">
-    <div class="vmodal-img" id="vmodal-img"><img id="vmodal-img-el" src="" alt=""></div>
+    <div class="vmodal-img" id="vmodal-img">
+      <div class="vmodal-img-main" id="vmodal-img-main">
+        <img id="vmodal-img-el" src="" alt="">
+        <button class="vmodal-img-arrow prev" onclick="vmodalNav(-1)">&#8592;</button>
+        <button class="vmodal-img-arrow next" onclick="vmodalNav(1)">&#8594;</button>
+      </div>
+      <div class="vmodal-img-dots" id="vmodal-img-dots"></div>
+    </div>
     <div class="vmodal-info">
       <span class="vmodal-badge" id="vmodal-badge"></span>
       <div class="vmodal-name" id="vmodal-name"></div>
@@ -1948,6 +2015,18 @@ footer{
   </div>
 </footer>
 
+
+<!-- ═══ LIGHTBOX ═══ -->
+<div id="lightbox">
+  <button id="lightbox-close" onclick="closeLightbox()">✕</button>
+  <div id="lightbox-img-wrap">
+    <span id="lightbox-counter"></span>
+    <button class="lightbox-arr prev" onclick="lbNav(-1)">&#8592;</button>
+    <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-arr next" onclick="lbNav(1)">&#8594;</button>
+  </div>
+  <div id="lightbox-thumbs"></div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
@@ -2135,16 +2214,22 @@ function _updateCardPhoto(cardIdx){
   }
 }
 
+// ── MODAL state
+let vmodalIdx = 0;      // current vehicle
+let vmodalPhotoIdx = 0; // current photo in modal
+
 function openModal(i){
-  const v=vehicles[i];
-  const imgEl=document.getElementById('vmodal-img-el');
-  imgEl.src=v.photo;
-  document.getElementById('vmodal-badge').textContent=v.badge;
-  document.getElementById('vmodal-name').textContent=v.name;
-  document.getElementById('vmodal-desc').textContent=v.desc;
-  document.getElementById('vmodal-price').textContent=v.precio;
-  document.getElementById('vmodal-wa').href=`https://wa.me/5492901000000?text=${v.wa}`;
-  document.getElementById('vmodal-specs').innerHTML=`
+  const v = vehicles[i];
+  vmodalIdx = i;
+  vmodalPhotoIdx = 0;
+
+  document.getElementById('vmodal-badge').textContent = v.badge;
+  document.getElementById('vmodal-name').textContent = v.name;
+  document.getElementById('vmodal-desc').textContent = v.desc;
+  document.getElementById('vmodal-price').textContent = v.precio;
+  document.getElementById('vmodal-wa').href = `https://wa.me/5492901606291?text=${v.wa}`;
+
+  document.getElementById('vmodal-specs').innerHTML = `
     <div class="vmodal-spec"><div class="vmodal-spec-label">Año</div><div class="vmodal-spec-val">${v.año}</div></div>
     <div class="vmodal-spec"><div class="vmodal-spec-label">Kilometraje</div><div class="vmodal-spec-val">${v.km}</div></div>
     <div class="vmodal-spec"><div class="vmodal-spec-label">Transmisión</div><div class="vmodal-spec-val">${v.transmision}</div></div>
@@ -2152,43 +2237,156 @@ function openModal(i){
     <div class="vmodal-spec"><div class="vmodal-spec-label">Color</div><div class="vmodal-spec-val">${v.color}</div></div>
     <div class="vmodal-spec"><div class="vmodal-spec-label">Puertas</div><div class="vmodal-spec-val">${v.puertas}</div></div>
   `;
-  // features
-  const featEl=document.getElementById('vmodal-features');
-  if(v.features&&v.features.length){
-    featEl.innerHTML=v.features.map(f=>`<span class="vmodal-feature">${f}</span>`).join('');
-    featEl.style.display='flex';
+
+  const featEl = document.getElementById('vmodal-features');
+  if(v.features && v.features.length){
+    featEl.innerHTML = v.features.map(f=>`<span class="vmodal-feature">${f}</span>`).join('');
+    featEl.style.display = 'flex';
   } else {
-    featEl.innerHTML='';featEl.style.display='none';
+    featEl.innerHTML = ''; featEl.style.display = 'none';
   }
-  // gallery
-  const infoEl=document.querySelector('.vmodal-info');
-  const oldGallery=infoEl.querySelector('.vmodal-gallery');
+
+  // Remove old gallery if any
+  const infoEl = document.querySelector('.vmodal-info');
+  const oldGallery = infoEl.querySelector('.vmodal-gallery');
   if(oldGallery) oldGallery.remove();
-  if(v.gallery&&v.gallery.length>1){
-    const gal=document.createElement('div');
-    gal.className='vmodal-gallery';
-    v.gallery.forEach((src,idx)=>{
-      const t=document.createElement('div');
-      t.className='vmodal-thumb'+(idx===0?' active':'');
-      t.style.backgroundImage=`url('${src}')`;
-      t.onclick=()=>{
-        imgEl.src=src;
-        gal.querySelectorAll('.vmodal-thumb').forEach(x=>x.classList.remove('active'));
-        t.classList.add('active');
-      };
-      gal.appendChild(t);
-    });
-    // insert before badge
-    infoEl.insertBefore(gal,infoEl.firstChild);
-  }
+
+  // Build new slider dots
+  _vmodalRender();
+
   document.getElementById('vmodal').classList.add('open');
-  document.body.style.overflow='hidden';
+  document.body.style.overflow = 'hidden';
 }
+
+function _vmodalRender(){
+  const v = vehicles[vmodalIdx];
+  const photos = v.gallery || [v.photo];
+  const idx = vmodalPhotoIdx;
+
+  // Image
+  const imgEl = document.getElementById('vmodal-img-el');
+  imgEl.src = photos[idx];
+
+  // Dots
+  const dotsEl = document.getElementById('vmodal-img-dots');
+  if(photos.length > 1){
+    dotsEl.innerHTML = photos.map((_,i)=>
+      `<div class="vmodal-img-dot${i===idx?' active':''}" onclick="vmodalDot(${i})"></div>`
+    ).join('');
+    dotsEl.style.display = 'flex';
+  } else {
+    dotsEl.innerHTML = '';
+    dotsEl.style.display = 'none';
+  }
+}
+
+function vmodalNav(dir){
+  const v = vehicles[vmodalIdx];
+  const total = (v.gallery || [v.photo]).length;
+  vmodalPhotoIdx = (vmodalPhotoIdx + dir + total) % total;
+  _vmodalRender();
+}
+
+function vmodalDot(idx){
+  vmodalPhotoIdx = idx;
+  _vmodalRender();
+}
+
+// Swipe support for modal image on mobile
+(function(){
+  const wrap = document.getElementById('vmodal-img-main');
+  let sx = 0;
+  wrap.addEventListener('touchstart', e=>{ sx = e.touches[0].clientX; }, {passive:true});
+  wrap.addEventListener('touchend', e=>{
+    const dx = e.changedTouches[0].clientX - sx;
+    if(Math.abs(dx) > 40) vmodalNav(dx < 0 ? 1 : -1);
+  }, {passive:true});
+  // Click on image opens lightbox
+  wrap.addEventListener('click', e=>{
+    if(e.target.closest('.vmodal-img-arrow')) return;
+    openLightbox(vmodalIdx, vmodalPhotoIdx);
+  });
+})();
+
 function closeModal(){
   document.getElementById('vmodal').classList.remove('open');
-  document.body.style.overflow='';
+  document.body.style.overflow = '';
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+// ── LIGHTBOX
+let lbVehicleIdx = 0;
+let lbPhotoIdx = 0;
+
+function openLightbox(vehicleIdx, photoIdx){
+  lbVehicleIdx = vehicleIdx;
+  lbPhotoIdx = photoIdx || 0;
+  _lbRender();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = document.getElementById('vmodal').classList.contains('open') ? 'hidden' : '';
+}
+
+function lbNav(dir){
+  const v = vehicles[lbVehicleIdx];
+  const total = (v.gallery || [v.photo]).length;
+  lbPhotoIdx = (lbPhotoIdx + dir + total) % total;
+  _lbRender();
+}
+
+function _lbRender(){
+  const v = vehicles[lbVehicleIdx];
+  const photos = v.gallery || [v.photo];
+  const total = photos.length;
+  const idx = lbPhotoIdx;
+
+  const img = document.getElementById('lightbox-img');
+  img.style.opacity = '0';
+  setTimeout(()=>{ img.src = photos[idx]; img.style.opacity = '1'; }, 100);
+
+  document.getElementById('lightbox-counter').textContent = `${idx+1} / ${total}`;
+
+  const thumbsEl = document.getElementById('lightbox-thumbs');
+  thumbsEl.innerHTML = photos.map((src,i)=>
+    `<div class="lb-thumb${i===idx?' active':''}" style="background-image:url('${src}')" onclick="lbThumb(${i})"></div>`
+  ).join('');
+  // Scroll active thumb into view
+  setTimeout(()=>{
+    const active = thumbsEl.querySelector('.lb-thumb.active');
+    if(active) active.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+  }, 120);
+}
+
+function lbThumb(i){
+  lbPhotoIdx = i;
+  _lbRender();
+}
+
+// Swipe lightbox
+(function(){
+  const wrap = document.getElementById('lightbox-img-wrap');
+  let sx = 0;
+  wrap.addEventListener('touchstart', e=>{ sx = e.touches[0].clientX; },{passive:true});
+  wrap.addEventListener('touchend', e=>{
+    const dx = e.changedTouches[0].clientX - sx;
+    if(Math.abs(dx) > 40) lbNav(dx < 0 ? 1 : -1);
+  },{passive:true});
+})();
+
+// Click card photo to open lightbox directly (without opening modal)
+document.querySelectorAll('.vcard-photo-col').forEach((col, i)=>{
+  col.addEventListener('click', e=>{
+    if(e.target.closest('.vcard-arrow') || e.target.closest('.vcard-dots')) return;
+    const idx = cardPhotoIdx[i] || 0;
+    openLightbox(i, idx);
+  });
+});
+
+
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(document.getElementById('lightbox').classList.contains('open')){ closeLightbox(); } else { closeModal(); } } });
 
 // ─── MOBILE MENU
 const ham=document.getElementById('ham'),mob=document.getElementById('mob');
