@@ -9,9 +9,20 @@
 <meta property="og:description" content="Compra, venta y consignación de vehículos seleccionados en Ushuaia, Tierra del Fuego.">
 <meta property="og:type" content="website">
 <title>JS SelectCars Automotores – Ushuaia, Tierra del Fuego</title>
+
+<!-- Preconnect crítico: fuentes y CDN de assets -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+<!-- Fuentes: solo los pesos que se usan -->
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- Preload del poster y primer frame del video hero (crítico para LCP) -->
+<link rel="preload" as="image" href="https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_1280,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg">
+<!-- Preload del video WebM para desktop; en mobile se omite por bandwidth -->
+<link rel="preload" as="video" href="https://res.cloudinary.com/dvvuwigmy/video/upload/f_webm,vc_vp9,q_auto:low,w_1280,br_800k/v1779233217/insta_video_41932_cupqvk.webm" media="(min-width:768px)">
 <style>
 /* ─── RESET & BASE ──────────────────────────────────────────── */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -336,7 +347,11 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
   flex-wrap:wrap;gap:28px;margin-bottom:64px;
 }
 
-/* ─── SCROLL REVEAL ─────────────────────────────────────────── */
+/* ─── PERFORMANCE: content-visibility for off-screen sections ── */
+#why,#services,#testimonials,#cta,#location,footer{
+  content-visibility:auto;
+  contain-intrinsic-size:0 600px;
+}
 .rv{opacity:1;transform:translateY(0)}
 .rv.in{opacity:1;transform:translateY(0)}
 
@@ -707,15 +722,22 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
 }
 
 /* ─── TESTIMONIALS ───────────────────────────────────────────── */
-#testimonials{background:var(--navy);overflow:hidden;padding:128px 0;position:relative;}
-#testimonials::before{
-  content:'';position:absolute;inset:0;
-  background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/w_1600,f_auto,q_auto:low/v1779255650/IMG_6809_xpkgli.jpg');
-  background-size:cover;background-position:center;
-  background-attachment:fixed;
-  opacity:.07;pointer-events:none;z-index:0;
-}
+#testimonials{background:var(--navy);overflow:hidden;padding:128px 0 0}
 .test-head,.test-wrap{position:relative;z-index:1}
+.test-photo{
+  display:block;
+  max-width:700px;
+  width:90%;
+  height:auto;
+  object-fit:contain;
+  object-position:center;
+  margin:60px auto 0;
+  opacity:.85;
+  filter:brightness(.9) saturate(1.1);
+  border-radius:6px;
+}
+@media(max-width:860px){.test-photo{max-width:500px;margin-top:40px}}
+@media(max-width:560px){.test-photo{max-width:100%;margin-top:28px}}
 .test-head{padding:0 80px;margin-bottom:64px}
 .test-wrap{position:relative}
 .test-wrap::before,.test-wrap::after{
@@ -723,7 +745,7 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
 }
 .test-wrap::before{left:0;background:linear-gradient(90deg,var(--navy),transparent)}
 .test-wrap::after{right:0;background:linear-gradient(-90deg,var(--navy),transparent)}
-.test-track{display:flex;gap:20px;animation:tSlide 10s linear infinite}
+.test-track{display:flex;gap:20px;animation:tSlide 10s linear infinite;will-change:transform}
 .test-track:hover{animation-play-state:paused}
 @keyframes tSlide{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .tcard{
@@ -1137,9 +1159,12 @@ footer{
 .sc-online{width:8px;height:8px;border-radius:50%;background:#22c55e;margin-top:1px;flex-shrink:0;box-shadow:0 0 8px rgba(34,197,94,.6)}
 
 #sc-chat-msgs{
-  flex:1;overflow-y:auto;padding:18px;
+  flex:1;min-height:0;overflow-y:auto;padding:18px;
   display:flex;flex-direction:column;gap:10px;
+  justify-content:flex-start;
+  -webkit-overflow-scrolling:touch;
   scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent;
+  scroll-behavior:smooth;
 }
 #sc-chat-msgs::-webkit-scrollbar{width:4px}
 #sc-chat-msgs::-webkit-scrollbar-track{background:transparent}
@@ -1193,14 +1218,13 @@ footer{
 @media(max-width:500px){
   #sc-tooltip{right:10px;bottom:90px;font-size:12px}
   #sc-chat-btn{bottom:20px;right:16px;width:56px;height:56px}
-  /* Full-screen chat on mobile, js will adjust bottom dynamically */
   #sc-chat-box{
     right:0;left:0;width:100%;
     bottom:0;
     border-radius:16px 16px 0 0;
-    height:auto;
+    height:75dvh;
     max-height:85dvh;
-    /* The box will be repositioned by JS when keyboard opens */
+    min-height:300px;
   }
 }
 /* Mobile: floating button sits above send button inside chat */
@@ -1257,11 +1281,93 @@ footer{
   const tooltipClose = document.getElementById('sc-tooltip-close');
   const WA           = '5492901606291';
 
+  // ── GEMINI CONFIG ──────────────────────────────────────────────
+  // Reemplazá GEMINI_API_KEY con tu clave real de Google AI Studio
+  const GEMINI_API_KEY = 'AIzaSyBYUB1WfWDGLXzTwXcN0160pEvgEUntKP4';
+  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+  const SYSTEM_PROMPT = `Sos el concierge automotriz premium de Select Cars, una agencia de vehículos ubicada en Ushuaia, Tierra del Fuego, Argentina.
+
+Tu trabajo es atender clientes de forma natural, humana y elegante, como un asesor real de una concesionaria premium.
+
+IMPORTANTE:
+- Nunca digas que sos una IA.
+- Nunca respondas robótico.
+- Nunca uses respuestas genéricas tipo soporte técnico.
+- Hablá como argentino.
+- Tono cercano, premium y profesional.
+- Conversación fluida y natural.
+- Transmití confianza y experiencia.
+- Tu objetivo principal es generar leads y derivar al WhatsApp para cerrar la venta.
+
+INFORMACIÓN DE LA EMPRESA:
+Nombre: Select Cars
+Ubicación: Ushuaia, Tierra del Fuego
+WhatsApp: +5492901606291
+
+ESTILO DE RESPUESTA:
+- Corto y claro. MÁXIMO 3 oraciones por respuesta.
+- Conversacional.
+- Elegante pero relajado.
+- Nunca demasiado formal.
+- Nunca demasiado vendedor.
+- Soná humano.
+- No uses asteriscos, markdown ni formato especial. Solo texto plano.
+
+FORMA DE HABLAR:
+Ejemplos correctos:
+- "Perfecto 👍"
+- "Buenísima elección."
+- "Sí, totalmente."
+- "Te recomiendo…"
+- "Depende un poco de lo que estés buscando."
+- "La Amarok anda increíble para Ushuaia."
+- "Tenemos opciones muy lindas en ese segmento."
+
+COMPORTAMIENTO:
+- Ayudá al usuario a encontrar el vehículo ideal.
+- Hacé preguntas inteligentes.
+- Detectá intención de compra.
+- Detectá si busca: SUV, pickup, deportivo, familiar, financiación, permuta, usado, premium.
+- Recomendá vehículos según necesidad.
+- Hablá como alguien que sabe de autos.
+
+CUANDO DERIVAR AL WHATSAPP:
+- Si pregunta precio → derivar
+- Si quiere comprar → derivar
+- Si pregunta financiación → derivar
+- Si pregunta disponibilidad → derivar
+- Si quiere coordinar visita → derivar
+- Si pregunta por permuta → derivar
+- Si parece interesado → derivar
+
+FORMA DE DERIVAR (nunca cortar seco):
+- "Te paso con un asesor así te muestra disponibilidad actual 👍"
+- "Si querés te derivamos por WhatsApp y te pasamos opciones reales."
+- "Por WhatsApp te podemos mostrar fotos, stock y financiación."
+- "Te paso directo con el equipo de Select Cars 🚘"
+
+IMPORTANTE:
+- Nunca inventes stock ni precios exactos.
+- Máximo 1 o 2 emojis por respuesta.
+- No uses listas con guiones ni bullets.
+- Respuestas cortas siempre.
+
+FLUJO ESPECIAL — CAPTACIÓN DE DATOS:
+Antes de derivar al WhatsApp, si aún no tenés los datos del cliente, pedí de forma natural:
+1. Nombre completo
+2. Número de celular
+3. Consulta o vehículo que busca
+
+Hacelo de forma conversacional, no como formulario.`;
+
+  // ── ESTADO ────────────────────────────────────────────────────
+  let history = []; // historial de conversación para Gemini
   let userData = { nombre:'', celular:'', consulta:'' };
-  let step = 'inicio';
+  let leadCapturado = false;
   let initiated = false;
 
-  // Tooltip: aparece a los 10s, desaparece solo a los 5s
+  // ── TOOLTIP ───────────────────────────────────────────────────
   const tooltipTimer = setTimeout(() => {
     tooltip.classList.add('show');
     setTimeout(() => tooltip.classList.remove('show'), 5000);
@@ -1279,15 +1385,22 @@ footer{
     const open = box.classList.toggle('open');
     if(open && !initiated){
       initiated = true;
-      botMsg(`👋 Hola! Bienvenido a <b>JS Select Cars</b>.<br><br>Soy tu asesor virtual 🚘<br><br>Te puedo ayudar con:<br>• Compra de vehículos<br>• Permutas<br>• Financiación<br>• Disponibilidad y precios<br><br>¿Cómo te llamás?`);
-      step = 'nombre';
+      const bienvenida = '👋 ¡Hola! Bienvenido a <b>JS Select Cars</b>.<br><br>Soy tu asesor 🚘 ¿En qué te puedo ayudar hoy?';
+      botMsg(bienvenida);
+      // Registrar el mensaje inicial en el historial como del asistente
+      history.push({ role: 'model', parts: [{ text: '👋 ¡Hola! Bienvenido a JS Select Cars. Soy tu asesor 🚘 ¿En qué te puedo ayudar hoy?' }] });
     }
     btn.classList.toggle('chat-open', open);
-    if(open) { input.focus(); updateChatPosition(); }
-    else { box.style.bottom = ''; box.style.height = ''; }
+    if(open) {
+      input.focus();
+      updateChatPosition();
+      scrollToBottom();
+    } else {
+      box.style.bottom = '';
+      box.style.height = '';
+    }
   };
 
-  // Cerrar al click fuera del chat
   document.addEventListener('click', (e) => {
     if(box.classList.contains('open') && !box.contains(e.target) && !btn.contains(e.target)){
       box.classList.remove('open');
@@ -1298,18 +1411,16 @@ footer{
   });
   box.addEventListener('click', (e) => e.stopPropagation());
 
-  // ── Mobile: stick chat box to keyboard using visualViewport ──
+  // ── MOBILE VIEWPORT ───────────────────────────────────────────
   function isMobile(){ return window.innerWidth <= 500; }
 
   function updateChatPosition(){
     if(!isMobile() || !box.classList.contains('open')) return;
     const vv = window.visualViewport;
     if(!vv) return;
-    // offsetTop = distance from top of layout viewport to top of visual viewport
     const keyboardHeight = window.innerHeight - vv.height - vv.offsetTop;
     const safeBottom = Math.max(keyboardHeight, 0);
     box.style.bottom = safeBottom + 'px';
-    // height: visual viewport height minus a bit for the header feel
     box.style.height = Math.min(vv.height * 0.88, 600) + 'px';
   }
 
@@ -1318,12 +1429,19 @@ footer{
     window.visualViewport.addEventListener('scroll', updateChatPosition);
   }
 
+  function scrollToBottom(){
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{ msgs.scrollTop = msgs.scrollHeight; });
+    });
+  }
+
+  // ── UI HELPERS ────────────────────────────────────────────────
   function botMsg(html){
     const d = document.createElement('div');
     d.className = 'sc-msg sc-bot';
     d.innerHTML = html;
     msgs.appendChild(d);
-    msgs.scrollTop = msgs.scrollHeight;
+    scrollToBottom();
   }
 
   function userMsg(text){
@@ -1331,17 +1449,16 @@ footer{
     d.className = 'sc-msg sc-user';
     d.textContent = text;
     msgs.appendChild(d);
-    msgs.scrollTop = msgs.scrollHeight;
+    scrollToBottom();
   }
 
-  function typing(){
+  function showTyping(){
     const d = document.createElement('div');
     d.className = 'sc-msg sc-bot sc-typing';
     d.id = 'sc-typing';
     d.innerHTML = '<span class="sc-dot"></span><span class="sc-dot"></span><span class="sc-dot"></span>';
     msgs.appendChild(d);
-    msgs.scrollTop = msgs.scrollHeight;
-    return d;
+    scrollToBottom();
   }
 
   function removeTyping(){
@@ -1349,63 +1466,110 @@ footer{
     if(t) t.remove();
   }
 
-  function reply(html, delay=700){
-    const t = typing();
-    setTimeout(()=>{ removeTyping(); botMsg(html); }, delay);
+  // ── BOTÓN WHATSAPP ────────────────────────────────────────────
+  function waButton(waText){
+    const waLink = `https://wa.me/${WA}?text=${encodeURIComponent(waText)}`;
+    return `<a href="${waLink}" target="_blank" rel="noopener"
+      style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:white;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:500;font-size:13px;margin-top:8px">
+      <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Ir a WhatsApp
+    </a>`;
   }
 
-  function handleStep(text){
-    if(step === 'nombre'){
-      userData.nombre = text;
-      reply(`Perfecto ${text.split(' ')[0]} 👍<br><br>¿Cuál es tu número de celular para que un asesor pueda contactarte?`);
-      step = 'celular';
-      return;
+  // ── DETECTAR DATOS DEL LEAD EN EL HISTORIAL ───────────────────
+  function extractLeadData(text){
+    // Detectar número de celular (10 dígitos arg, con o sin prefijo)
+    if(!userData.celular){
+      const tel = text.match(/(?:\+54|0054|54)?[\s\-]?(?:11|[2-9]\d)[\s\-]?\d{4}[\s\-]?\d{4}/);
+      if(tel) userData.celular = tel[0].replace(/[\s\-]/g,'');
     }
-    if(step === 'celular'){
-      userData.celular = text;
-      reply('Excelente 🚘<br><br>Contame: ¿qué vehículo estás buscando o cuál es tu consulta?');
-      step = 'consulta';
-      return;
-    }
-    if(step === 'consulta'){
-      userData.consulta = text;
-      reply(autoReply(text));
-      const waText = `Hola Select Cars 👋\n\nNombre: ${userData.nombre}\nCelular: ${userData.celular}\n\nConsulta:\n${userData.consulta}`;
-      const waLink = `https://wa.me/${WA}?text=${encodeURIComponent(waText)}`;
-      setTimeout(()=>{
-        botMsg(`📲 Ya tengo todo listo.<br><br>Tocá el botón para seguir con un asesor por WhatsApp 🚀<br><br>
-          <a href="${waLink}" target="_blank" rel="noopener"
-            style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:white;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:500;font-size:13px;margin-top:4px">
-            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            Ir a WhatsApp
-          </a>`);
-      }, 1600);
-      step = 'final';
-      return;
-    }
-    if(step === 'final'){
-      reply('😊 Para más consultas escribinos directo por WhatsApp, un asesor te va a ayudar enseguida.');
+    // Nombre: si es la primera respuesta corta (≤4 palabras, sin números, sin palabras de consulta)
+    if(!userData.nombre && text.split(' ').length <= 4 && !/\d/.test(text) &&
+       !/(auto|moto|suv|pickup|precio|financi|permuta|compra|vendo|hola)/i.test(text)){
+      userData.nombre = text.trim();
     }
   }
 
-  function autoReply(text){
-    const t = text.toLowerCase();
-    if(t.includes('financi')) return 'Sí 👍 Tenemos opciones de financiación según el vehículo y anticipo disponible.<br><br>Un asesor te pasa todas las opciones exactas por WhatsApp.';
-    if(t.includes('permuta')) return 'Tomamos permutas 🚘<br><br>Por WhatsApp podés enviar fotos y datos de tu vehículo para cotizarlo.';
-    if(t.includes('hilux') || t.includes('toyota')) return 'Excelente elección 🔥 La Toyota Hilux es uno de los más buscados.<br><br>Te derivamos con un asesor para mostrarte disponibilidad y precios actualizados.';
-    if(t.includes('mercedes') || t.includes('benz') || t.includes('glc')) return 'El Mercedes-Benz GLC 300 es una SUV premium increíble 🏆<br><br>Un asesor te da todos los detalles por WhatsApp.';
-    if(t.includes('byd') || t.includes('shark') || t.includes('yuan')) return 'La línea BYD es una de nuestras estrellas ⚡<br><br>Un asesor te muestra disponibilidad, versiones y precios.';
-    if(t.includes('precio') || t.includes('valor') || t.includes('costo')) return 'Los valores varían según modelo, año y equipamiento 👍<br><br>Un asesor te pasa precio actualizado y disponibilidad exacta.';
-    if(t.includes('gr-86') || t.includes('gr86')) return 'El Toyota GR-86 es puro ADN deportivo 🏎️<br><br>Un asesor te da todos los detalles por WhatsApp.';
-    return 'Perfecto 👍<br><br>Un asesor de JS Select Cars te va a ayudar con esa consulta de manera personalizada.';
+  // ── GEMINI API CALL ───────────────────────────────────────────
+  async function askGemini(userText){
+    // Agregar mensaje del usuario al historial
+    history.push({ role: 'user', parts: [{ text: userText }] });
+
+    // Construir contexto de datos capturados para el system prompt
+    let contextExtra = '';
+    if(userData.nombre) contextExtra += `\nDatos capturados — Nombre: ${userData.nombre}`;
+    if(userData.celular) contextExtra += `\nDatos capturados — Celular: ${userData.celular}`;
+    if(leadCapturado) contextExtra += '\nYa tenés nombre y celular del cliente. Podés derivar a WhatsApp en esta respuesta si el momento es oportuno. Incluí al final de tu respuesta el texto exacto: [MOSTRAR_WA]';
+
+    const payload = {
+      system_instruction: { parts: [{ text: SYSTEM_PROMPT + contextExtra }] },
+      contents: history,
+      generationConfig: {
+        temperature: 0.85,
+        maxOutputTokens: 300,
+        topP: 0.9
+      }
+    };
+
+    const res = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if(!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No pude responder ahora. ¿Me escribís por WhatsApp? 👍';
+
+    // Guardar respuesta del modelo en el historial
+    history.push({ role: 'model', parts: [{ text: reply }] });
+    return reply;
   }
 
-  function doSend(){
+  // ── SEND ──────────────────────────────────────────────────────
+  async function doSend(){
     const text = input.value.trim();
     if(!text) return;
+
     userMsg(text);
     input.value = '';
-    setTimeout(() => handleStep(text), 400);
+    input.disabled = true;
+    send.disabled = true;
+
+    extractLeadData(text);
+    if(userData.nombre && userData.celular) leadCapturado = true;
+
+    showTyping();
+
+    try {
+      let reply = await askGemini(text);
+
+      removeTyping();
+
+      // Verificar si Gemini indica mostrar el botón de WA
+      const mostrarWA = reply.includes('[MOSTRAR_WA]');
+      reply = reply.replace('[MOSTRAR_WA]', '').trim();
+
+      // Convertir saltos de línea a <br>
+      const replyHtml = reply.replace(/\n/g, '<br>');
+      botMsg(replyHtml);
+
+      if(mostrarWA){
+        const nombre = userData.nombre || 'Cliente';
+        const celular = userData.celular || '';
+        const consulta = history.filter(h=>h.role==='user').map(h=>h.parts[0].text).join(' / ');
+        const waText = `Hola Select Cars 👋\n\nNombre: ${nombre}\nCelular: ${celular}\n\nConsulta: ${consulta.substring(0,200)}`;
+        setTimeout(()=>{ botMsg('📲 ' + waButton(waText)); }, 600);
+      }
+    } catch(err) {
+      removeTyping();
+      console.error('Gemini error:', err);
+      botMsg('Perdoná, tuve un problema técnico 🙏 Escribinos directo por WhatsApp y te atendemos ahora mismo.');
+    }
+
+    input.disabled = false;
+    send.disabled = false;
+    input.focus();
   }
 
   send.addEventListener('click', doSend);
@@ -1425,7 +1589,7 @@ footer{
     <li><a href="#testimonials">Clientes</a></li>
     <li><a href="#location">Ubicación</a></li>
   </ul>
-  <a href="https://wa.me/5492901000000?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo." class="nav-wa" target="_blank" rel="noopener">
+  <a href="https://wa.me/5492901606291?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo." class="nav-wa" target="_blank" rel="noopener">
     <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
     WhatsApp
   </a>
@@ -1442,7 +1606,7 @@ footer{
   <a href="#testimonials" onclick="closeMob()">Clientes</a>
   <a href="#location" onclick="closeMob()">Ubicación</a>
   <a href="#" onclick="closeMob();openSoldGallery();return false;">Unidades Vendidas</a>
-  <a href="https://wa.me/5492901000000?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo." target="_blank" rel="noopener" style="color:var(--blue)">WhatsApp →</a>
+  <a href="https://wa.me/5492901606291?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo." target="_blank" rel="noopener" style="color:var(--blue)">WhatsApp →</a>
 </div>
 
 <!-- ═══ UNIDADES VENDIDAS GALLERY OVERLAY ═══ -->
@@ -1579,41 +1743,50 @@ document.addEventListener('keydown',e=>{
     muted
     loop
     playsinline
-    preload="none"
+    preload="metadata"
     poster="https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_1280,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg"
   >
-    <!-- WebM: ~40-60% smaller than MP4, served to Chrome/Firefox/Edge -->
     <source
       src="https://res.cloudinary.com/dvvuwigmy/video/upload/f_webm,vc_vp9,q_auto:low,w_1280,br_800k/v1779233217/insta_video_41932_cupqvk.webm"
       type="video/webm"
     >
-    <!-- MP4 H.264: fallback for Safari/iOS -->
     <source
       src="https://res.cloudinary.com/dvvuwigmy/video/upload/f_mp4,vc_h264,q_auto:low,w_1280,br_800k/v1779233217/insta_video_41932_cupqvk.mp4"
       type="video/mp4"
     >
   </video>
   <script>
-  // Inicia el video en cuanto el hero es visible (no bloquea carga inicial)
   (function(){
     var vid = document.getElementById('hero-video');
     if(!vid) return;
-    // En conexiones lentas o datos limitados, no reproducir
     var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    if(conn && (conn.saveData || conn.effectiveType === '2g')) return;
-    // IntersectionObserver: cargar solo cuando el hero está en viewport
-    if('IntersectionObserver' in window){
-      var io = new IntersectionObserver(function(entries){
-        if(entries[0].isIntersecting){
-          vid.load();
-          vid.play().catch(function(){});
-          io.disconnect();
-        }
-      }, {threshold: 0.01});
-      io.observe(vid);
-    } else {
-      vid.load();
-      vid.play().catch(function(){});
+    if(conn && conn.saveData) return;
+    var slow = conn && (conn.effectiveType==='2g'||conn.effectiveType==='slow-2g');
+    if(slow) return;
+    // Desktop: preload completo para reproducción instantánea
+    if(window.innerWidth >= 768) vid.preload = 'auto';
+    function tryPlay(){ vid.play().catch(function(){}); }
+    // Si ya tiene datos suficientes, play directo; si no, esperar loadeddata
+    if(vid.readyState >= 2){ tryPlay(); }
+    else { vid.addEventListener('loadeddata', tryPlay, {once:true}); vid.load(); }
+    // Service Worker inline (sin archivo externo)
+    if('serviceWorker' in navigator){
+      const swCode = `
+const CACHE='jsselectcars-v1';
+self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.add('https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_1280,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg')).then(()=>self.skipWaiting()))});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==CACHE).map(n=>caches.delete(n)))).then(()=>self.clients.claim()))});
+self.addEventListener('fetch',e=>{
+  const u=e.request.url;
+  if(!u.includes('res.cloudinary.com'))return;
+  if((u.includes('.webm')||u.includes('.mp4'))&&e.request.headers.get('range'))return;
+  e.respondWith(caches.open(CACHE).then(async c=>{
+    const cached=await c.match(e.request);
+    if(cached)return cached;
+    try{const r=await fetch(e.request);if(r.ok)c.put(e.request,r.clone());return r;}catch(err){return cached||new Response('',{status:503});}
+  }));
+});`;
+      const blob = new Blob([swCode],{type:'text/javascript'});
+      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function(){});
     }
   })();
   </script>
@@ -1706,7 +1879,7 @@ document.addEventListener('keydown',e=>{
         <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         Ver Vehículos
       </a>
-      <a href="https://wa.me/5492901000000?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo." class="btn-g" target="_blank" rel="noopener">
+      <a href="https://wa.me/5492901606291?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo." class="btn-g" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         Escribinos
       </a>
@@ -1748,7 +1921,7 @@ document.addEventListener('keydown',e=>{
     </div>
     <div class="rv" style="max-width:300px">
       <p style="font-size:14px;color:rgba(245,247,250,.42);line-height:1.85;margin-bottom:20px">Cada unidad pasa por un proceso de selección riguroso. Solo lo mejor llega a nuestros clientes.</p>
-      <a href="https://wa.me/5492901000000?text=Hola!%20Quisiera%20ver%20el%20cat%C3%A1logo%20completo%20de%20veh%C3%ADculos." class="btn-g" target="_blank" rel="noopener" style="display:inline-flex;font-size:11px">Ver catálogo completo →</a>
+      <a href="https://wa.me/5492901606291?text=Hola!%20Quisiera%20ver%20el%20cat%C3%A1logo%20completo%20de%20veh%C3%ADculos." class="btn-g" target="_blank" rel="noopener" style="display:inline-flex;font-size:11px">Ver catálogo completo →</a>
     </div>
   </div>
 
@@ -1770,7 +1943,7 @@ document.addEventListener('keydown',e=>{
           <div class="vaño">2024 · 39.000 km</div>
         </div>
         <div class="vcard-info-bottom">
-          <a class="vbtn-wa" href="https://wa.me/5492901000000?text=Hola!%20Me%20interesa%20la%20Toyota%20Hilux%20SRV%202024.%20%C2%BFPod%C3%A9s%20darme%20m%C3%A1s%20info%3F" target="_blank" rel="noopener">
+          <a class="vbtn-wa" href="https://wa.me/5492901606291?text=Hola!%20Me%20interesa%20la%20Toyota%20Hilux%20SRV%202024.%20%C2%BFPod%C3%A9s%20darme%20m%C3%A1s%20info%3F" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.563 4.14 1.535 5.874L.057 23.886l6.188-1.453A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.808 9.808 0 01-5.032-1.388l-.36-.214-3.733.877.936-3.619-.235-.373A9.79 9.79 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
             Consultar precio
           </a>
@@ -1794,7 +1967,7 @@ document.addEventListener('keydown',e=>{
           <div class="vaño">2026 · 0 km</div>
         </div>
         <div class="vcard-info-bottom">
-          <a class="vbtn-wa" href="https://wa.me/5492901000000?text=Hola!%20Me%20interesa%20la%20BYD%20Shark%202026.%20%C2%BFPod%C3%A9s%20darme%20m%C3%A1s%20info%3F" target="_blank" rel="noopener">
+          <a class="vbtn-wa" href="https://wa.me/5492901606291?text=Hola!%20Me%20interesa%20la%20BYD%20Shark%202026.%20%C2%BFPod%C3%A9s%20darme%20m%C3%A1s%20info%3F" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.563 4.14 1.535 5.874L.057 23.886l6.188-1.453A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.808 9.808 0 01-5.032-1.388l-.36-.214-3.733.877.936-3.619-.235-.373A9.79 9.79 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
             Consultar precio
           </a>
@@ -1818,7 +1991,7 @@ document.addEventListener('keydown',e=>{
           <div class="vaño">2026 · 0 km</div>
         </div>
         <div class="vcard-info-bottom">
-          <a class="vbtn-wa" href="https://wa.me/5492901000000?text=Hola!%20Me%20interesa%20el%20BYD%20Yuan%20Pro%202026.%20%C2%BFPod%C3%A9s%20darme%20m%C3%A1s%20info%3F" target="_blank" rel="noopener">
+          <a class="vbtn-wa" href="https://wa.me/5492901606291?text=Hola!%20Me%20interesa%20el%20BYD%20Yuan%20Pro%202026.%20%C2%BFPod%C3%A9s%20darme%20m%C3%A1s%20info%3F" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.563 4.14 1.535 5.874L.057 23.886l6.188-1.453A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.808 9.808 0 01-5.032-1.388l-.36-.214-3.733.877.936-3.619-.235-.373A9.79 9.79 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
             Consultar precio
           </a>
@@ -1842,7 +2015,7 @@ document.addEventListener('keydown',e=>{
           <div class="vaño">2026 · 2.200 km</div>
         </div>
         <div class="vcard-info-bottom">
-          <a class="vbtn-wa" href="https://wa.me/5492901000000?text=Hola!%20Me%20interesa%20el%20Toyota%20GR-86%202026.%20%C2%BFPod%C3%A9s%20darme%20m%C3%A1s%20info%3F" target="_blank" rel="noopener">
+          <a class="vbtn-wa" href="https://wa.me/5492901606291?text=Hola!%20Me%20interesa%20el%20Toyota%20GR-86%202026.%20%C2%BFPod%C3%A9s%20darme%20m%C3%A1s%20info%3F" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.563 4.14 1.535 5.874L.057 23.886l6.188-1.453A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.808 9.808 0 01-5.032-1.388l-.36-.214-3.733.877.936-3.619-.235-.373A9.79 9.79 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
             Consultar precio
           </a>
@@ -1866,7 +2039,7 @@ document.addEventListener('keydown',e=>{
           <div class="vaño">2017 · 70.000 km</div>
         </div>
         <div class="vcard-info-bottom">
-          <a class="vbtn-wa" href="https://wa.me/5492901000000?text=Hola!%20Me%20interesa%20el%20Mercedes%20Benz%20GLC%20300%202017.%20%C2%BFPod%C3%A9s%20darme%20m%C3%A1s%20info%3F" target="_blank" rel="noopener">
+          <a class="vbtn-wa" href="https://wa.me/5492901606291?text=Hola!%20Me%20interesa%20el%20Mercedes%20Benz%20GLC%20300%202017.%20%C2%BFPod%C3%A9s%20darme%20m%C3%A1s%20info%3F" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.563 4.14 1.535 5.874L.057 23.886l6.188-1.453A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.808 9.808 0 01-5.032-1.388l-.36-.214-3.733.877.936-3.619-.235-.373A9.79 9.79 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
             Consultar precio
           </a>
@@ -1880,7 +2053,7 @@ document.addEventListener('keydown',e=>{
 
 
   <div style="text-align:center;margin-top:60px" class="rv">
-    <a href="https://wa.me/5492901000000?text=Hola!%20Quisiera%20ver%20el%20cat%C3%A1logo%20completo%20de%20veh%C3%ADculos%20disponibles." class="btn-p" target="_blank" rel="noopener">
+    <a href="https://wa.me/5492901606291?text=Hola!%20Quisiera%20ver%20el%20cat%C3%A1logo%20completo%20de%20veh%C3%ADculos%20disponibles." class="btn-p" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:white;fill:none;stroke-width:2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       Consultar stock completo por WhatsApp
     </a>
@@ -2090,9 +2263,14 @@ document.addEventListener('keydown',e=>{
       </div>
     </div>
   </div>
+  <img
+    class="test-photo"
+    src="https://res.cloudinary.com/dvvuwigmy/image/upload/w_1600,f_auto,q_auto/v1779255650/IMG_6809_xpkgli.jpg"
+    alt="Clientes JS SelectCars"
+    loading="lazy"
+    decoding="async"
+  >
 </section>
-
-<!-- ═══ CTA ═══ -->
 <section id="cta">
   <div class="cta-rings" aria-hidden="true">
     <div class="cta-ring"></div>
@@ -2103,7 +2281,7 @@ document.addEventListener('keydown',e=>{
     <div class="sec-lbl" style="justify-content:center">Contacto directo</div>
     <h2 class="cta-h2">Hablemos sobre<br>tu próximo vehículo</h2>
     <p class="cta-p">Asesoramiento personalizado y vehículos seleccionados<br>en Ushuaia, Tierra del Fuego.</p>
-    <a href="https://wa.me/5492901000000?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo%20y%20recibir%20asesoramiento%20personalizado." class="btn-wa" target="_blank" rel="noopener">
+    <a href="https://wa.me/5492901606291?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo%20y%20recibir%20asesoramiento%20personalizado." class="btn-wa" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       Escribinos por WhatsApp
     </a>
@@ -2135,7 +2313,7 @@ document.addEventListener('keydown',e=>{
       <div class="loc-ico"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.36 12a19.79 19.79 0 01-3.07-8.67A2 2 0 013.26 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
       <div>
         <div class="loc-lbl">WhatsApp</div>
-        <div class="loc-val"><a href="https://wa.me/5492901000000" style="color:var(--blue);text-decoration:none">+54 9 2901 000-000</a></div>
+        <div class="loc-val"><a href="https://wa.me/5492901606291" style="color:var(--blue);text-decoration:none">+54 9 2901 000-000</a></div>
       </div>
     </div>
     <div class="loc-row">
@@ -2171,7 +2349,7 @@ document.addEventListener('keydown',e=>{
         <a href="https://instagram.com/js.selectcars" class="fsoc" target="_blank" rel="noopener" aria-label="Instagram">
           <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
         </a>
-        <a href="https://wa.me/5492901000000" class="fsoc" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <a href="https://wa.me/5492901606291" class="fsoc" target="_blank" rel="noopener" aria-label="WhatsApp">
           <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         </a>
         <a href="https://maps.google.com/?q=Gobernador+Deloqui+1456+Ushuaia" class="fsoc" target="_blank" rel="noopener" aria-label="Ubicación">
@@ -2194,7 +2372,7 @@ document.addEventListener('keydown',e=>{
       <div class="foot-col-h">Contacto</div>
       <ul class="foot-ul">
         <li><a href="https://maps.google.com/?q=Gobernador+Deloqui+1456+Ushuaia" target="_blank" rel="noopener">Deloqui 1456, Ushuaia</a></li>
-        <li><a href="https://wa.me/5492901000000">+54 9 2901 000-000</a></li>
+        <li><a href="https://wa.me/5492901606291">+54 9 2901 000-000</a></li>
         <li><a href="https://instagram.com/js.selectcars" target="_blank" rel="noopener">@js.selectcars</a></li>
         <li><a href="#location">Lun–Vie 9:00–19:00</a></li>
         <li><a href="#location">Sáb 9:00–14:00</a></li>
@@ -2560,16 +2738,20 @@ vehicles.forEach((v,idx)=>{
   });
 })();
 
-// ─── LOADING SCREEN
+// ─── LOADING SCREEN: dismiss as fast as fonts are ready, max 800ms
 (()=>{
   const loader=document.getElementById('loader');
   if(!loader) return;
+  // Hard cap: never show loader more than 1s
+  const dismiss = () => {
+    loader.style.transition='opacity .5s';
+    loader.style.opacity='0';
+    setTimeout(()=>{ if(loader.parentNode) loader.remove(); },520);
+  };
+  const maxTimer = setTimeout(dismiss, 1000);
   document.fonts.ready.then(()=>{
-    // fonts are ready, now logo renders correctly — wait a beat then dismiss
-    setTimeout(()=>{
-      loader.style.opacity='0';
-      setTimeout(()=>loader.remove(),900);
-    },1200);
+    clearTimeout(maxTimer);
+    setTimeout(dismiss, 300);
   });
 })();
 </script>
