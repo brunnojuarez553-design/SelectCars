@@ -140,7 +140,8 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
 }
 .nav-wa:hover{box-shadow:0 0 28px var(--blue-glow);transform:translateY(-1px)}
 .nav-wa svg{width:14px;height:14px;fill:white;flex-shrink:0}
-.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:10px;background:none;border:none;min-width:44px;min-height:44px;align-items:center;justify-content:center}
+.nav-links,.nav-wa{display:none}
+.hamburger{display:flex;flex-direction:column;gap:5px;cursor:pointer;padding:10px;background:none;border:none;min-width:44px;min-height:44px;align-items:center;justify-content:center}
 .hamburger span{display:block;width:22px;height:1px;background:var(--white);transition:.3s}
 .hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
 .hamburger.open span:nth-child(2){opacity:0}
@@ -922,8 +923,6 @@ footer{
 /* ── TABLET ── */
 @media(max-width:860px){
   nav{padding:0 20px;height:64px}
-  .nav-links,.nav-wa{display:none}
-  .hamburger{display:flex}
   .mobile-menu{top:64px}
 
   .sec{padding:64px 20px}
@@ -1077,418 +1076,803 @@ footer{
 <div id="cur"></div>
 <div id="cur-r"></div>
 
-<!-- CHAT IA FLOAT -->
+<!-- ═══════════════════════════════════════════════
+     CHAT PREMIUM — SELECT CARS · USHUAIA
+     Pure HTML/CSS/JS · Sin APIs · Sin backend
+════════════════════════════════════════════════ -->
 <style>
-#sc-chat-btn{
-  position:fixed;bottom:32px;right:32px;z-index:9998;
-  width:64px;height:64px;border-radius:50%;
-  background:#fff;color:white;border:none;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 28px rgba(0,0,0,.35);
-  transition:transform .3s,box-shadow .3s;
-  animation:waEntry .6s 2s both;
-  padding:0;overflow:hidden;
+/* ── CHAT PREMIUM STYLES ─────────────────────────── */
+
+/* Botón flotante */
+#sc-btn {
+  position: fixed; bottom: 28px; right: 28px; z-index: 9998;
+  width: 62px; height: 62px; border-radius: 50%;
+  background: #fff; border: none; cursor: pointer; padding: 0;
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,.45), 0 0 0 0 rgba(37,99,235,.4);
+  transition: transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s;
+  animation: sc-entry .7s 2.2s both;
 }
-#sc-chat-btn:hover{transform:scale(1.08);box-shadow:0 8px 40px rgba(0,0,0,.45)}
-#sc-chat-btn img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-.sc-pulse{
-  position:absolute;inset:-5px;border-radius:50%;
-  border:2px solid rgba(37,99,235,.45);
-  animation:waPulse 2.5s infinite;
+@keyframes sc-entry { from { opacity:0; transform:scale(.5) translateY(20px) } to { opacity:1; transform:scale(1) translateY(0) } }
+#sc-btn:hover { transform: scale(1.1); box-shadow: 0 12px 48px rgba(0,0,0,.5), 0 0 0 8px rgba(37,99,235,.12); }
+#sc-btn img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+.sc-btn-ring {
+  position: absolute; inset: -6px; border-radius: 50%;
+  border: 2px solid rgba(37,99,235,.5);
+  animation: sc-ring 2.8s ease-out infinite;
+}
+.sc-btn-ring:nth-child(2) { animation-delay: 1.4s; }
+@keyframes sc-ring { 0% { transform:scale(1); opacity:.7 } 100% { transform:scale(1.7); opacity:0 } }
+
+/* Notif badge */
+#sc-badge {
+  position: absolute; top: 2px; right: 2px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #ef4444; border: 2px solid #050505;
+  font-size: 9px; color: white; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  animation: sc-badge-in .4s .5s both;
+}
+@keyframes sc-badge-in { from { transform:scale(0) } to { transform:scale(1) } }
+
+/* Tooltip proactivo */
+#sc-tip {
+  position: fixed; bottom: 100px; right: 28px; z-index: 9997;
+  background: rgba(12,26,46,.97);
+  border: 1px solid rgba(37,99,235,.25);
+  backdrop-filter: blur(20px);
+  padding: 12px 36px 12px 14px; border-radius: 12px 12px 4px 12px;
+  font-size: 13px; font-weight: 400; color: rgba(245,247,250,.9);
+  line-height: 1.45; max-width: 230px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+  opacity: 0; pointer-events: none;
+  transform: translateY(10px) scale(.95);
+  transition: opacity .35s, transform .35s;
+}
+#sc-tip::after {
+  content:''; position:absolute; bottom:-7px; right:20px;
+  border:7px solid transparent;
+  border-top-color: rgba(12,26,46,.97); border-bottom:none;
+}
+#sc-tip.show { opacity:1; pointer-events:auto; transform:translateY(0) scale(1); }
+#sc-tip-x {
+  position:absolute; top:6px; right:8px; background:none; border:none;
+  color:rgba(255,255,255,.35); cursor:pointer; font-size:14px; line-height:1;
+  padding:2px 4px; transition:color .2s;
+}
+#sc-tip-x:hover { color:rgba(255,255,255,.8); }
+
+/* Ventana del chat */
+#sc-box {
+  position: fixed; bottom: 100px; right: 28px; z-index: 9997;
+  width: 385px; max-width: calc(100vw - 40px);
+  height: 610px; max-height: calc(100dvh - 120px);
+  display: none; flex-direction: column;
+  border-radius: 20px; overflow: hidden;
+  background: linear-gradient(160deg, rgba(10,20,36,.98) 0%, rgba(7,17,31,.99) 100%);
+  border: 1px solid rgba(255,255,255,.09);
+  box-shadow:
+    0 32px 80px rgba(0,0,0,.7),
+    0 0 0 1px rgba(37,99,235,.08),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  font-family: 'DM Sans', sans-serif;
+  transform-origin: bottom right;
+  transition: opacity .3s, transform .3s cubic-bezier(.34,1.2,.64,1);
+}
+#sc-box.sc-opening {
+  display: flex;
+  animation: sc-box-in .35s cubic-bezier(.34,1.2,.64,1) both;
+}
+#sc-box.open { display:flex; }
+@keyframes sc-box-in {
+  from { opacity:0; transform:scale(.92) translateY(16px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
 }
 
-/* ── Tooltip/cartel ── */
-#sc-tooltip{
-  position:fixed;bottom:104px;right:32px;z-index:9997;
-  background:var(--white);color:var(--black);
-  padding:7px 28px 7px 11px;border-radius:8px 8px 3px 8px;
-  font-size:11.5px;font-weight:500;line-height:1.3;
-  box-shadow:0 4px 18px rgba(0,0,0,.22);
-  white-space:nowrap;
-  opacity:0;pointer-events:none;
-  transform:translateY(6px) scale(.95);
-  transition:opacity .3s,transform .3s;
+/* Header */
+#sc-head {
+  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(37,99,235,.18) 0%, rgba(7,17,31,0) 100%);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+  position: relative;
 }
-#sc-tooltip.show{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
-#sc-tooltip::after{
-  content:'';position:absolute;bottom:-6px;right:18px;
-  border:6px solid transparent;
-  border-top-color:var(--white);border-bottom:none;
+#sc-head::before {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(90deg, rgba(37,99,235,.08) 0%, transparent 60%);
+  pointer-events:none;
 }
-#sc-tooltip-close{
-  position:absolute;top:4px;right:6px;
-  background:none;border:none;cursor:pointer;
-  font-size:11px;color:rgba(0,0,0,.3);line-height:1;
-  padding:1px 3px;
+.sc-av {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink:0;
+  overflow: hidden;
+  border: 2px solid rgba(37,99,235,.4);
+  box-shadow: 0 0 16px rgba(37,99,235,.25);
 }
-#sc-tooltip-close:hover{color:rgba(0,0,0,.7)}
+.sc-av img { width:100%; height:100%; object-fit:cover; }
+.sc-head-info { flex:1; }
+.sc-head-name {
+  font-size: 14px; font-weight: 500; color: #f5f7fa;
+  letter-spacing: .3px; margin-bottom: 3px;
+}
+.sc-head-sub {
+  font-size: 11px; color: rgba(245,247,250,.42);
+  letter-spacing: .3px; display:flex; align-items:center; gap:6px;
+}
+.sc-online-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #22c55e; flex-shrink:0;
+  box-shadow: 0 0 8px rgba(34,197,94,.7);
+  animation: sc-pulse-green 2s infinite;
+}
+@keyframes sc-pulse-green {
+  0%,100% { box-shadow: 0 0 8px rgba(34,197,94,.7); }
+  50%      { box-shadow: 0 0 16px rgba(34,197,94,.9); }
+}
+#sc-close {
+  background: rgba(255,255,255,.06); border: none; border-radius: 50%;
+  width: 32px; height: 32px; cursor:pointer; color:rgba(255,255,255,.5);
+  display:flex; align-items:center; justify-content:center;
+  font-size: 16px; transition: background .2s, color .2s; flex-shrink:0;
+}
+#sc-close:hover { background:rgba(255,255,255,.12); color:#fff; }
+
+/* Quick actions chips */
+#sc-chips {
+  padding: 10px 14px 4px;
+  display: flex; gap: 7px; flex-wrap: wrap; flex-shrink:0;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.sc-chip {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid rgba(37,99,235,.3);
+  background: rgba(37,99,235,.08);
+  color: rgba(245,247,250,.7); font-size: 11.5px;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+}
+.sc-chip:hover { background: rgba(37,99,235,.2); border-color:rgba(37,99,235,.6); color:#fff; transform:translateY(-1px); }
+
+/* Mensajes */
+#sc-msgs {
+  flex:1; min-height:0; overflow-y:auto;
+  padding: 16px 14px; display:flex; flex-direction:column; gap:8px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+#sc-msgs::-webkit-scrollbar { width:3px; }
+#sc-msgs::-webkit-scrollbar-track { background:transparent; }
+#sc-msgs::-webkit-scrollbar-thumb { background:rgba(255,255,255,.07); border-radius:2px; }
+
+/* Grupos de mensajes */
+.sc-group { display:flex; flex-direction:column; gap:3px; max-width:86%; }
+.sc-group.sc-group-user { align-self:flex-end; align-items:flex-end; }
+.sc-group.sc-group-bot  { align-self:flex-start; align-items:flex-start; }
+
+/* Burbuja */
+.sc-bub {
+  padding: 10px 14px; line-height: 1.55; font-size: 13.5px;
+  word-break: break-word;
+  animation: sc-bub-in .28s cubic-bezier(.34,1.2,.64,1) both;
+}
+@keyframes sc-bub-in {
+  from { opacity:0; transform:scale(.92) translateY(6px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+.sc-bub-bot {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.08);
+  color: rgba(245,247,250,.92);
+  border-radius: 4px 16px 16px 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.2);
+}
+.sc-bub-user {
+  background: linear-gradient(135deg, #2563EB, #1d4ed8);
+  color: white;
+  border-radius: 16px 16px 4px 16px;
+  box-shadow: 0 4px 16px rgba(37,99,235,.35);
+}
+
+/* Timestamp */
+.sc-ts {
+  font-size: 10px; color: rgba(245,247,250,.22);
+  padding: 0 4px; letter-spacing:.3px;
+}
+
+/* Typing indicator */
+#sc-typing-ind {
+  align-self: flex-start; max-width:80px;
+  padding: 12px 16px; border-radius: 4px 16px 16px 16px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.08);
+  display: none; gap: 5px; align-items: center;
+  animation: sc-bub-in .25s both;
+}
+#sc-typing-ind.show { display:flex; }
+.sc-dot-t {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(37,99,235,.7);
+  animation: sc-dot-bounce 1.3s infinite;
+}
+.sc-dot-t:nth-child(2) { animation-delay:.18s; background:rgba(37,99,235,.85); }
+.sc-dot-t:nth-child(3) { animation-delay:.36s; background:var(--blue); }
+@keyframes sc-dot-bounce {
+  0%,60%,100% { transform:translateY(0); opacity:.4; }
+  30%          { transform:translateY(-7px); opacity:1; }
+}
+
+/* Card de vehículo recomendado */
+.sc-car-card {
+  background: rgba(37,99,235,.08);
+  border: 1px solid rgba(37,99,235,.22);
+  border-radius: 12px; padding: 12px 14px;
+  margin-top: 6px; font-size: 13px;
+  transition: border-color .2s, background .2s;
+}
+.sc-car-card:hover { border-color:rgba(37,99,235,.45); background:rgba(37,99,235,.13); }
+.sc-car-card-name { font-weight:500; color:#f5f7fa; margin-bottom:4px; font-size:13.5px; }
+.sc-car-card-detail { color:rgba(245,247,250,.5); font-size:12px; line-height:1.5; }
+
+/* Botón WhatsApp */
+.sc-wa-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: white; text-decoration: none;
+  padding: 12px 20px; border-radius: 12px;
+  font-weight: 500; font-size: 13px; margin-top: 8px;
+  transition: transform .2s, box-shadow .2s;
+  box-shadow: 0 4px 20px rgba(37,211,102,.3);
+}
+.sc-wa-btn:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(37,211,102,.45); }
+.sc-wa-btn svg { width:16px; height:16px; fill:white; flex-shrink:0; }
+
+/* Input area */
+#sc-input-area {
+  padding: 12px 14px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  background: rgba(5,10,20,.6);
+  backdrop-filter: blur(10px);
+  display: flex; gap: 8px; align-items: flex-end; flex-shrink:0;
+}
+#sc-input {
+  flex:1; padding: 11px 14px;
+  border-radius: 12px; border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.05);
+  color: #f5f7fa; font-size: 15px; font-family:'DM Sans',sans-serif;
+  outline: none; resize:none; min-height:42px; max-height:100px;
+  line-height:1.4; transition: border-color .2s, background .2s;
+  scrollbar-width: none;
+}
+#sc-input:focus { border-color:rgba(37,99,235,.5); background:rgba(255,255,255,.07); }
+#sc-input::placeholder { color:rgba(245,247,250,.28); }
+#sc-input::-webkit-scrollbar { display:none; }
+#sc-send {
+  width: 42px; height: 42px; border-radius: 12px; border:none;
+  background: linear-gradient(135deg, #2563EB, #1d4ed8);
+  color: white; cursor:pointer; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  transition: transform .2s, box-shadow .2s;
+  box-shadow: 0 4px 16px rgba(37,99,235,.4);
+}
+#sc-send:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(37,99,235,.5); }
+#sc-send svg { width:18px; height:18px; stroke:white; fill:none; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+
+/* Separador fecha */
+.sc-date-sep {
+  text-align:center; font-size:10px; letter-spacing:2px;
+  text-transform:uppercase; color:rgba(245,247,250,.2);
+  padding: 4px 0; margin: 4px 0;
+}
+
+/* ── RESPONSIVE ─────────────────────────────── */
 @media(max-width:500px){
-  #sc-tooltip{right:10px;bottom:90px;font-size:12px}
-  #sc-chat-btn{bottom:20px;right:16px;width:56px;height:56px}
-}
-
-#sc-chat-box{
-  position:fixed;bottom:100px;right:32px;z-index:9997;
-  width:370px;max-width:calc(100vw - 44px);
-  height:600px;max-height:calc(100vh - 130px);
-  background:var(--navy2);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:16px;
-  overflow:hidden;
-  display:none;flex-direction:column;
-  box-shadow:0 20px 60px rgba(0,0,0,.6);
-  font-family:'DM Sans',sans-serif;
-}
-#sc-chat-box.open{display:flex}
-
-#sc-chat-header{
-  background:linear-gradient(135deg,var(--navy),var(--navy2));
-  padding:18px 20px;
-  border-bottom:1px solid rgba(255,255,255,.07);
-  display:flex;align-items:center;gap:12px;
-}
-.sc-avatar{
-  width:40px;height:40px;border-radius:50%;
-  background:var(--blue);display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.sc-avatar svg{width:20px;height:20px;stroke:white;fill:none;stroke-width:2}
-.sc-header-txt h3{margin:0;font-size:15px;font-weight:500;color:var(--white);letter-spacing:.3px}
-.sc-header-txt p{margin:3px 0 0;font-size:12px;color:rgba(245,247,250,.45);letter-spacing:.3px}
-.sc-online{width:8px;height:8px;border-radius:50%;background:#22c55e;margin-top:1px;flex-shrink:0;box-shadow:0 0 8px rgba(34,197,94,.6)}
-
-#sc-chat-msgs{
-  flex:1;min-height:0;overflow-y:auto;padding:18px;
-  display:flex;flex-direction:column;gap:10px;
-  justify-content:flex-start;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent;
-  scroll-behavior:smooth;
-}
-#sc-chat-msgs::-webkit-scrollbar{width:4px}
-#sc-chat-msgs::-webkit-scrollbar-track{background:transparent}
-#sc-chat-msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
-
-.sc-msg{
-  padding:12px 15px;border-radius:14px;
-  max-width:86%;line-height:1.5;font-size:13.5px;
-}
-.sc-bot{
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.07);
-  color:var(--white);align-self:flex-start;
-  border-radius:4px 14px 14px 14px;
-}
-.sc-user{
-  background:var(--blue);color:white;
-  align-self:flex-end;
-  border-radius:14px 14px 4px 14px;
-}
-
-.sc-typing{display:flex;gap:5px;align-items:center;padding:14px 16px}
-.sc-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);animation:scDot 1.2s infinite}
-.sc-dot:nth-child(2){animation-delay:.2s}
-.sc-dot:nth-child(3){animation-delay:.4s}
-@keyframes scDot{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-6px);opacity:1}}
-
-#sc-chat-input-area{
-  display:flex;gap:10px;padding:14px;
-  border-top:1px solid rgba(255,255,255,.07);
-  background:var(--navy);
-}
-#sc-chat-input{
-  flex:1;padding:12px 15px;
-  border-radius:10px;border:1px solid rgba(255,255,255,.09);
-  background:rgba(255,255,255,.05);
-  color:var(--white);font-size:13.5px;font-family:'DM Sans',sans-serif;
-  outline:none;transition:border-color .2s;
-}
-#sc-chat-input:focus{border-color:rgba(37,99,235,.5)}
-#sc-chat-input::placeholder{color:rgba(245,247,250,.3)}
-#sc-chat-send{
-  padding:0 18px;border-radius:10px;border:none;
-  background:var(--blue);color:white;
-  font-size:13px;font-weight:500;letter-spacing:.5px;
-  cursor:pointer;transition:box-shadow .2s,transform .2s;
-  white-space:nowrap;
-}
-#sc-chat-send:hover{box-shadow:0 0 20px var(--blue-glow);transform:translateY(-1px)}
-
-@media(max-width:500px){
-  #sc-tooltip{right:10px;bottom:90px;font-size:12px}
-  #sc-chat-btn{bottom:20px;right:16px;width:56px;height:56px}
-  #sc-chat-box{
-    right:0;left:0;width:100%;
-    bottom:0;
-    border-radius:16px 16px 0 0;
-    height:75dvh;
-    max-height:85dvh;
-    min-height:300px;
+  #sc-btn { bottom:18px; right:16px; width:56px; height:56px; }
+  #sc-tip { right:12px; bottom:86px; max-width:200px; font-size:12px; }
+  #sc-box {
+    right:0; left:0; bottom:0; width:100%;
+    border-radius:20px 20px 0 0;
+    height:80dvh; max-height:90dvh;
+    transform-origin: bottom center;
   }
+  #sc-btn.sc-open { opacity:0; pointer-events:none; }
 }
-/* Mobile: floating button sits above send button inside chat */
-@media(max-width:500px){
-  #sc-chat-btn.chat-open{
-    /* hide the floating bubble when chat is open — it's redundant */
-    opacity:0;pointer-events:none;
-  }
-}
-#sc-chat-input{font-size:16px}
 </style>
 
-<!-- Tooltip -->
-<div id="sc-tooltip">
-  💬 ¿Necesitás una consulta? ¡Presioná aquí!
-  <button id="sc-tooltip-close" aria-label="Cerrar">✕</button>
+<!-- Tooltip proactivo -->
+<div id="sc-tip">
+  ¿Buscás tu próximo vehículo? Te ayudo a encontrarlo 🚘
+  <button id="sc-tip-x" aria-label="Cerrar">✕</button>
 </div>
 
 <!-- Botón flotante -->
-<button id="sc-chat-btn" aria-label="Abrir asistente virtual">
-  <div class="sc-pulse"></div>
-  <img src="https://res.cloudinary.com/dvvuwigmy/image/upload/f_png/v1779231886/IMG_6738_eqd5o6.jpg" alt="JS SelectCars">
+<button id="sc-btn" aria-label="Abrir asesor virtual">
+  <div class="sc-btn-ring"></div>
+  <div class="sc-btn-ring"></div>
+  <div id="sc-badge">1</div>
+  <img src="https://res.cloudinary.com/dvvuwigmy/image/upload/f_png/v1779231886/IMG_6738_eqd5o6.jpg" alt="Select Cars">
 </button>
 
 <!-- Ventana del chat -->
-<div id="sc-chat-box">
-  <div id="sc-chat-header">
-    <div class="sc-avatar">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+<div id="sc-box">
+  <!-- Header -->
+  <div id="sc-head">
+    <div class="sc-av">
+      <img src="https://res.cloudinary.com/dvvuwigmy/image/upload/f_png/v1779231886/IMG_6738_eqd5o6.jpg" alt="Select Cars">
     </div>
-    <div class="sc-header-txt">
-      <h3>Select Cars IA</h3>
-      <p>Asesor virtual · Ushuaia, Tierra del Fuego</p>
+    <div class="sc-head-info">
+      <div class="sc-head-name">Select Cars · Concierge</div>
+      <div class="sc-head-sub">
+        <span class="sc-online-dot"></span>
+        En línea ahora · Ushuaia, Tierra del Fuego
+      </div>
     </div>
-    <div class="sc-online" title="En línea"></div>
+    <button id="sc-close" aria-label="Cerrar">✕</button>
   </div>
 
-  <div id="sc-chat-msgs"></div>
+  <!-- Quick chips -->
+  <div id="sc-chips">
+    <button class="sc-chip" data-msg="Quiero ver vehículos">🚘 Ver vehículos</button>
+    <button class="sc-chip" data-msg="Quiero financiar">💳 Financiación</button>
+    <button class="sc-chip" data-msg="Quiero permutar mi auto">🔄 Permuta</button>
+    <button class="sc-chip" data-msg="Quiero consignar mi auto">📋 Consignación</button>
+  </div>
 
-  <div id="sc-chat-input-area">
-    <input type="text" id="sc-chat-input" placeholder="Escribí tu consulta...">
-    <button id="sc-chat-send">Enviar</button>
+  <!-- Mensajes -->
+  <div id="sc-msgs">
+    <div id="sc-typing-ind">
+      <span class="sc-dot-t"></span>
+      <span class="sc-dot-t"></span>
+      <span class="sc-dot-t"></span>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div id="sc-input-area">
+    <textarea id="sc-input" placeholder="Escribí tu consulta…" rows="1"></textarea>
+    <button id="sc-send" aria-label="Enviar">
+      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
   </div>
 </div>
 
 <script>
+/* ═══════════════════════════════════════════════
+   SELECT CARS — CHAT CONCIERGE PREMIUM
+   Puro HTML/CSS/JS — Sin APIs — Sin backend
+═══════════════════════════════════════════════ */
 (function(){
-  const btn          = document.getElementById('sc-chat-btn');
-  const box          = document.getElementById('sc-chat-box');
-  const msgs         = document.getElementById('sc-chat-msgs');
-  const input        = document.getElementById('sc-chat-input');
-  const send         = document.getElementById('sc-chat-send');
-  const tooltip      = document.getElementById('sc-tooltip');
-  const tooltipClose = document.getElementById('sc-tooltip-close');
-  const WA           = '5492901606291';
+  'use strict';
 
-  let userData = { nombre:'', celular:'', consulta:'' };
-  let step = 'inicio';
+  // ── CONFIG ────────────────────────────────────
+  const WA_NUM = '5492901606291';
+  const LOGO   = 'https://res.cloudinary.com/dvvuwigmy/image/upload/f_png/v1779231886/IMG_6738_eqd5o6.jpg';
+
+  // ── DOM ───────────────────────────────────────
+  const btn     = document.getElementById('sc-btn');
+  const box     = document.getElementById('sc-box');
+  const msgs    = document.getElementById('sc-msgs');
+  const input   = document.getElementById('sc-input');
+  const sendBtn = document.getElementById('sc-send');
+  const tip     = document.getElementById('sc-tip');
+  const tipX    = document.getElementById('sc-tip-x');
+  const badge   = document.getElementById('sc-badge');
+  const typingEl= document.getElementById('sc-typing-ind');
+  const closeBtn= document.getElementById('sc-close');
+  const chips   = document.querySelectorAll('.sc-chip');
+
+  // ── ESTADO / MEMORIA ──────────────────────────
+  const mem = {
+    nombre: '', celular: '', consulta: '',
+    presupuesto: '', financiacion: false,
+    permuta: false, consign: false,
+    vehiculoInteres: '', tipoCliente: 'nuevo',
+    leadCaliente: false, turno: 0,
+    consignVehiculo:'', consignKm:'', consignEstado:''
+  };
+  let fase = 'bienvenida'; // fases: bienvenida > nombre > celular > libre > consign_v > consign_km > consign_estado > final
   let initiated = false;
+  let isTyping  = false;
+  let proactiveTimer, proactiveTimer2;
 
-  // Tooltip: aparece a los 10s, desaparece solo a los 5s
-  const tooltipTimer = setTimeout(() => {
-    tooltip.classList.add('show');
-    setTimeout(() => tooltip.classList.remove('show'), 5000);
-  }, 10000);
+  // ── RESPUESTAS VARIABLES ──────────────────────
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
-  tooltipClose.addEventListener('click', e => {
-    e.stopPropagation();
-    tooltip.classList.remove('show');
-  });
+  const acks = [
+    '¡Entendido!', 'Perfecto 👌', 'Buenísimo.', 'Dale, anotado.', 'Copado.', '¡Genial!', 'Sí, claro.', 'Por supuesto.'
+  ];
+  const afirm = [
+    '¡Claro que sí!', 'Totalmente.', 'Sí, sin problema.', '¡Con gusto!', 'Sin duda.'
+  ];
+  const trans = [
+    'Te cuento…', 'Mirá…', 'Fijate…', 'Te paso el dato…', 'Escuchame…'
+  ];
 
-  btn.onclick = (e) => {
-    e.stopPropagation();
-    tooltip.classList.remove('show');
-    clearTimeout(tooltipTimer);
-    const open = box.classList.toggle('open');
-    if(open && !initiated){
-      initiated = true;
-      botMsg(`👋 Hola! Bienvenido a <b>JS Select Cars</b>.<br><br>Soy tu asesor virtual 🚘<br><br>Te puedo ayudar con:<br>• Compra de vehículos<br>• Consignación de tu vehículo<br>• Permutas<br>• Financiación<br>• Disponibilidad y precios<br><br>¿Cómo te llamás?`);
-      step = 'nombre';
-    }
-    btn.classList.toggle('chat-open', open);
-    if(open) {
-      input.focus();
-      updateChatPosition();
-      scrollToBottom();
-    } else {
-      box.style.bottom = '';
-      box.style.height = '';
-    }
+  // ── CATÁLOGO VEHÍCULOS ────────────────────────
+  const catalogo = {
+    suv: [
+      { name:'Toyota Hilux SW4', detail:'7 asientos · Diesel · AWD · Ideal para familia aventurera.' },
+      { name:'Mercedes-Benz GLC 300', detail:'SUV premium · Automático · Tecnología de punta.' },
+      { name:'BYD Yuan Plus', detail:'SUV eléctrica · Tecnología china de vanguardia · Gran autonomía.' },
+    ],
+    pickup: [
+      { name:'Toyota Hilux 2.8 D/C', detail:'La pickup más buscada del país · Diesel · 4x4 · Disponible.' },
+      { name:'BYD Shark', detail:'Pickup eléctrica · La revolución del segmento · Potencia brutal.' },
+    ],
+    deportivo: [
+      { name:'Toyota GR-86', detail:'Coupé deportivo · Tracción trasera · ADN de pista.' },
+      { name:'Mercedes-Benz AMG', detail:'Deportividad extrema · Sonido brutal · Experiencia única.' },
+    ],
+    familiar: [
+      { name:'Toyota Hilux SW4', detail:'Familiar y versátil · 7 asientos · Confort total.' },
+      { name:'BYD Yuan Plus', detail:'Familiar y sustentable · Ahorro en combustible · Equipamiento top.' },
+    ],
+    electrico: [
+      { name:'BYD Yuan Plus', detail:'SUV eléctrica · Autonomía 400km · Carga rápida.' },
+      { name:'BYD Shark', detail:'Pickup eléctrica · La más innovadora del mercado.' },
+    ],
+    premium: [
+      { name:'Mercedes-Benz GLC 300', detail:'Lujo alemán · Tecnología de primer nivel · Impecable.' },
+      { name:'Toyota GR-86', detail:'Deportividad refinada · Exclusivo · Para quien quiere diferenciarse.' },
+    ],
   };
 
-  // Cerrar al click fuera del chat
-  document.addEventListener('click', (e) => {
-    if(box.classList.contains('open') && !box.contains(e.target) && !btn.contains(e.target)){
-      box.classList.remove('open');
-      btn.classList.remove('chat-open');
-      box.style.bottom = '';
-      box.style.height = '';
-    }
-  });
-  box.addEventListener('click', (e) => e.stopPropagation());
-
-  // ── Mobile: stick chat box to keyboard using visualViewport ──
-  function isMobile(){ return window.innerWidth <= 500; }
-
-  function updateChatPosition(){
-    if(!isMobile() || !box.classList.contains('open')) return;
-    const vv = window.visualViewport;
-    if(!vv) return;
-    // offsetTop = distance from top of layout viewport to top of visual viewport
-    const keyboardHeight = window.innerHeight - vv.height - vv.offsetTop;
-    const safeBottom = Math.max(keyboardHeight, 0);
-    box.style.bottom = safeBottom + 'px';
-    // height: visual viewport height minus a bit for the header feel
-    box.style.height = Math.min(vv.height * 0.88, 600) + 'px';
+  // ── DETECCIÓN DE INTENCIONES ──────────────────
+  function detectar(t) {
+    const s = t.toLowerCase();
+    const res = { tipo: null, leadCaliente: false, esConsign: false, esPermuta: false, esFinanciacion: false };
+    // lead caliente
+    if (/\b(comprar|compro|precio|hoy|contado|cuánto vale|cuanto vale|cuotas|ya|urgente|disponible)\b/.test(s)) res.leadCaliente = true;
+    // consignación
+    if (/consign|vender mi|poner en venta|quiero vender|vendo mi/.test(s)) res.esConsign = true;
+    // permuta
+    if (/permut|cambio mi|entrego mi|parte de pago/.test(s)) res.esPermuta = true;
+    // financiación
+    if (/financi|cuota|plan|crédito|credito|banco/.test(s)) res.esFinanciacion = true;
+    // tipo vehículo
+    if (/suv|4x4|camioneta grande|familiar grande/.test(s)) res.tipo = 'suv';
+    else if (/pickup|hilux|ranger|amarok|byd shark|shark/.test(s)) res.tipo = 'pickup';
+    else if (/deport|sport|gr.?86|coupe|rápido|velocidad|amg/.test(s)) res.tipo = 'deportivo';
+    else if (/famil|chicos|niños|grande para|7 asientos|7asientos/.test(s)) res.tipo = 'familiar';
+    else if (/eléctri|electri|byd|yuan|autonomía/.test(s)) res.tipo = 'electrico';
+    else if (/premium|lujo|mercedes|benz|glc|ejecutivo/.test(s)) res.tipo = 'premium';
+    return res;
   }
 
-  if(window.visualViewport){
-    window.visualViewport.addEventListener('resize', updateChatPosition);
-    window.visualViewport.addEventListener('scroll', updateChatPosition);
+  function recomendarVehiculos(tipo) {
+    const lista = catalogo[tipo];
+    if (!lista) return '';
+    const html = lista.map(v =>
+      `<div class="sc-car-card"><div class="sc-car-card-name">🚘 ${v.name}</div><div class="sc-car-card-detail">${v.detail}</div></div>`
+    ).join('');
+    return html;
   }
 
-  function scrollToBottom(){
-    // Doble RAF: garantiza que el DOM haya pintado el nuevo mensaje antes de scrollear
-    requestAnimationFrame(()=>{
-      requestAnimationFrame(()=>{
-        msgs.scrollTop = msgs.scrollHeight;
+  // ── UTILS ─────────────────────────────────────
+  function now() {
+    return new Date().toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+  }
+
+  function scrollDown() {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        msgs.scrollTop = msgs.scrollHeight + 9999;
+        const last = msgs.lastElementChild;
+        if (last && last !== typingEl) last.scrollIntoView({ block:'end', behavior:'smooth' });
       });
     });
   }
 
-  function botMsg(html){
-    const d = document.createElement('div');
-    d.className = 'sc-msg sc-bot';
-    d.innerHTML = html;
-    msgs.appendChild(d);
-    scrollToBottom();
+  function waLink(texto) {
+    return `https://wa.me/${WA_NUM}?text=${encodeURIComponent(texto)}`;
   }
 
-  function userMsg(text){
-    const d = document.createElement('div');
-    d.className = 'sc-msg sc-user';
-    d.textContent = text;
-    msgs.appendChild(d);
-    scrollToBottom();
+  function waBtn(url, label='Ir a WhatsApp') {
+    return `<a href="${url}" target="_blank" rel="noopener" class="sc-wa-btn">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      ${label}
+    </a>`;
   }
 
-  function typing(){
-    const d = document.createElement('div');
-    d.className = 'sc-msg sc-bot sc-typing';
-    d.id = 'sc-typing';
-    d.innerHTML = '<span class="sc-dot"></span><span class="sc-dot"></span><span class="sc-dot"></span>';
-    msgs.appendChild(d);
-    scrollToBottom();
-    return d;
+  // ── RENDER MENSAJES ───────────────────────────
+  function addMsg(html, quien, delay_anim=0) {
+    // Sacar typing indicator del DOM antes de insertar
+    const group = document.createElement('div');
+    group.className = `sc-group sc-group-${quien}`;
+    const bub = document.createElement('div');
+    bub.className = `sc-bub sc-bub-${quien}`;
+    bub.style.animationDelay = `${delay_anim}ms`;
+    bub.innerHTML = html;
+    const ts = document.createElement('div');
+    ts.className = 'sc-ts';
+    ts.textContent = now();
+    group.appendChild(bub);
+    group.appendChild(ts);
+    // insertar antes del typing indicator
+    msgs.insertBefore(group, typingEl);
+    scrollDown();
+    return group;
   }
 
-  function removeTyping(){
-    const t = document.getElementById('sc-typing');
-    if(t) t.remove();
+  function showTyping(ms = 1200) {
+    if (isTyping) return;
+    isTyping = true;
+    typingEl.classList.add('show');
+    msgs.appendChild(typingEl); // lo mueve al final
+    scrollDown();
+    return new Promise(res => setTimeout(() => {
+      typingEl.classList.remove('show');
+      isTyping = false;
+      res();
+    }, ms));
   }
 
-  function reply(html, delay=700){
-    const t = typing();
-    setTimeout(()=>{ removeTyping(); botMsg(html); scrollToBottom(); }, delay);
+  async function botSay(html, typingMs) {
+    // tiempo de typing proporcional a la longitud del mensaje
+    const ms = typingMs || Math.min(800 + html.replace(/<[^>]*>/g,'').length * 18, 2200);
+    await showTyping(ms);
+    addMsg(html, 'bot');
+    scrollDown();
   }
 
-  function handleStep(text){
-    if(step === 'nombre'){
-      userData.nombre = text;
-      reply(`Perfecto ${text.split(' ')[0]} 👍<br><br>¿Cuál es tu número de celular para que un asesor pueda contactarte?`);
-      step = 'celular';
-      return;
-    }
-    if(step === 'celular'){
-      userData.celular = text;
-      reply('Excelente 🚘<br><br>Contame: ¿qué vehículo estás buscando o cuál es tu consulta?');
-      step = 'consulta';
-      return;
-    }
-    if(step === 'consulta'){
-      userData.consulta = text;
-      const t = text.toLowerCase();
-      const esConsignacion = t.includes('consign') || t.includes('vender') || t.includes('vendo') || t.includes('quiero vender') || t.includes('poner en venta');
-      if(esConsignacion){
-        reply(`Genial ${userData.nombre.split(' ')[0]} 🚗<br><br>Trabajamos la consignación sin costo por adelantado — vos dejás el auto y nosotros nos encargamos de venderlo.<br><br>Para darte una valuación, contame:<br><b>¿Qué vehículo querés consignar?</b> (marca, modelo y año)`);
-        step = 'consign_vehiculo';
-        return;
+  function userSay(text) {
+    addMsg(text, 'user');
+  }
+
+  // ── PROACTIVO ─────────────────────────────────
+  function startProactive() {
+    proactiveTimer = setTimeout(() => {
+      if (!initiated) {
+        tip.classList.add('show');
+        setTimeout(() => tip.classList.remove('show'), 6000);
       }
-      reply(autoReply(text));
-      finalizarConWA();
-      step = 'final';
-      return;
-    }
-    if(step === 'consign_vehiculo'){
-      userData.consignVehiculo = text;
-      reply(`Perfecto 👍<br><br>¿Cuántos kilómetros tiene aproximadamente?`);
-      step = 'consign_km';
-      return;
-    }
-    if(step === 'consign_km'){
-      userData.consignKm = text;
-      reply(`Excelente.<br><br>Por último: ¿en qué estado general está el vehículo? (muy bueno / bueno / regular)`);
-      step = 'consign_estado';
-      return;
-    }
-    if(step === 'consign_estado'){
-      userData.consignEstado = text;
-      reply(`Perfecto, ya tengo todos los datos 📋<br><br>Un asesor de JS Select Cars te va a contactar para darte la valuación y los detalles del proceso de consignación.`);
-      const waText = `Hola Select Cars 👋\n\nConsulta de CONSIGNACIÓN\n\nNombre: ${userData.nombre}\nCelular: ${userData.celular}\n\nVehículo: ${userData.consignVehiculo}\nKilometraje: ${userData.consignKm}\nEstado: ${userData.consignEstado}`;
-      const waLink = `https://wa.me/${WA}?text=${encodeURIComponent(waText)}`;
-      setTimeout(()=>{
-        botMsg(`📲 Tocá el botón para continuar con un asesor por WhatsApp 🚀<br><br>
-          <a href="${waLink}" target="_blank" rel="noopener"
-            style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:white;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:500;font-size:13px;margin-top:4px">
-            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            Ir a WhatsApp
-          </a>`);
-      }, 1400);
-      step = 'final';
-      return;
-    }
-    if(step === 'final'){
-      reply('😊 Para más consultas escribinos directo por WhatsApp, un asesor te va a ayudar enseguida.');
-    }
+    }, 12000);
+    proactiveTimer2 = setTimeout(() => {
+      if (!initiated) {
+        tip.classList.add('show');
+      }
+    }, 30000);
   }
 
-  function finalizarConWA(){
-    const waText = `Hola Select Cars 👋\n\nNombre: ${userData.nombre}\nCelular: ${userData.celular}\n\nConsulta:\n${userData.consulta}`;
-    const waLink = `https://wa.me/${WA}?text=${encodeURIComponent(waText)}`;
-    setTimeout(()=>{
-      botMsg(`📲 Ya tengo todo listo.<br><br>Tocá el botón para seguir con un asesor por WhatsApp 🚀<br><br>
-        <a href="${waLink}" target="_blank" rel="noopener"
-          style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:white;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:500;font-size:13px;margin-top:4px">
-          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Ir a WhatsApp
-        </a>`);
-    }, 1600);
+  // ── BIENVENIDA ────────────────────────────────
+  async function bienvenida() {
+    const hora = new Date().getHours();
+    const saludo = hora < 12 ? '¡Buenos días!' : hora < 20 ? '¡Buenas tardes!' : '¡Buenas noches!';
+    await botSay(`${saludo} 👋 Bienvenido a <strong>Select Cars</strong>.<br><br>Soy tu concierge automotriz. Estoy acá para ayudarte a encontrar el vehículo perfecto, o lo que necesites: financiación, permuta, consignación…<br><br>¿Cómo te llamás?`, 1800);
+    fase = 'nombre';
   }
 
-  function autoReply(text){
-    const t = text.toLowerCase();
-    if(t.includes('consign') || t.includes('quiero vender') || t.includes('vendo mi')) return 'Perfecto 🚗 Trabajamos la consignación sin costo por adelantado — vos dejás el auto y nosotros lo vendemos.<br><br>Un asesor te guía con la valuación y el proceso completo.';
-    if(t.includes('financi')) return 'Sí 👍 Tenemos opciones de financiación según el vehículo y anticipo disponible.<br><br>Un asesor te pasa todas las opciones exactas por WhatsApp.';
-    if(t.includes('permuta')) return 'Tomamos permutas 🚘<br><br>Por WhatsApp podés enviar fotos y datos de tu vehículo para cotizarlo.';
-    if(t.includes('hilux') || t.includes('toyota')) return 'Excelente elección 🔥 La Toyota Hilux es uno de los más buscados.<br><br>Te derivamos con un asesor para mostrarte disponibilidad y precios actualizados.';
-    if(t.includes('mercedes') || t.includes('benz') || t.includes('glc')) return 'El Mercedes-Benz GLC 300 es una SUV premium increíble 🏆<br><br>Un asesor te da todos los detalles por WhatsApp.';
-    if(t.includes('byd') || t.includes('shark') || t.includes('yuan')) return 'La línea BYD es una de nuestras estrellas ⚡<br><br>Un asesor te muestra disponibilidad, versiones y precios.';
-    if(t.includes('precio') || t.includes('valor') || t.includes('costo')) return 'Los valores varían según modelo, año y equipamiento 👍<br><br>Un asesor te pasa precio actualizado y disponibilidad exacta.';
-    if(t.includes('gr-86') || t.includes('gr86')) return 'El Toyota GR-86 es puro ADN deportivo 🏎️<br><br>Un asesor te da todos los detalles por WhatsApp.';
-    return 'Perfecto 👍<br><br>Un asesor de JS Select Cars te va a ayudar con esa consulta de manera personalizada.';
+  // ── MOTOR DE RESPUESTAS ───────────────────────
+  async function responder(texto) {
+    mem.turno++;
+    const t = texto.toLowerCase();
+    const det = detectar(texto);
+
+    // Guardar contexto
+    if (det.leadCaliente)   mem.leadCaliente = true;
+    if (det.esFinanciacion) mem.financiacion = true;
+    if (det.esPermuta)      mem.permuta = true;
+    if (det.tipo)           mem.vehiculoInteres = det.tipo;
+
+    const nombre1 = mem.nombre ? mem.nombre.split(' ')[0] : '';
+
+    // ── FASES LINEALES ────────────────────────
+    if (fase === 'nombre') {
+      mem.nombre = texto.trim();
+      const n = mem.nombre.split(' ')[0];
+      await botSay(`Mucho gusto, <strong>${n}</strong>! 🤝<br><br>¿Me dejás tu número de celular? Así si necesitás que un asesor te llame o te mande info, lo tenemos.`, 1000);
+      fase = 'celular';
+      return;
+    }
+
+    if (fase === 'celular') {
+      mem.celular = texto.trim();
+      await botSay(`${pick(acks)} Anotado 📝<br><br>Contame, ${nombre1} — ¿qué estás buscando? Un modelo específico, tipo de vehículo, presupuesto… lo que tengas en mente.`, 900);
+      fase = 'libre';
+      return;
+    }
+
+    // ── Consignación paso a paso ──────────────
+    if (fase === 'consign_v') {
+      mem.consignVehiculo = texto;
+      await botSay(`Perfecto. ¿Cuántos kilómetros tiene más o menos?`, 700);
+      fase = 'consign_km';
+      return;
+    }
+    if (fase === 'consign_km') {
+      mem.consignKm = texto;
+      await botSay(`¿Y en qué estado general está? Muy bueno, bueno, regular…`, 700);
+      fase = 'consign_estado';
+      return;
+    }
+    if (fase === 'consign_estado') {
+      mem.consignEstado = texto;
+      const waT = `Hola Select Cars 👋\n\n📋 CONSULTA DE CONSIGNACIÓN\n\nNombre: ${mem.nombre}\nCelular: ${mem.celular}\n\nVehículo: ${mem.consignVehiculo}\nKilometraje: ${mem.consignKm}\nEstado: ${mem.consignEstado}`;
+      await botSay(`Listo, ya tengo todo 📋<br><br>Tenés un vehículo en buenas condiciones — nuestros asesores van a darte una valuación justa y honesta.<br><br>Tocá el botón para seguir con un especialista:<br><br>${waBtn(waLink(waT), 'Hablar con un asesor')}`, 1400);
+      fase = 'final';
+      return;
+    }
+
+    if (fase === 'final') {
+      await botSay(`${nombre1 ? nombre1 + ', ' : ''}para cualquier otra consulta escribinos por WhatsApp — nuestros asesores están disponibles ahora mismo 🚘`, 900);
+      return;
+    }
+
+    // ── FASE LIBRE — motor de intenciones ────────
+    // Consignación
+    if (det.esConsign) {
+      await botSay(`${pick(afirm)} Trabajamos consignación sin costo anticipado — vos dejás el auto, nosotros nos encargamos de venderlo al mejor precio 🚗<br><br>Para darte una valuación, ¿qué vehículo querés consignar? (marca, modelo y año)`, 1200);
+      fase = 'consign_v';
+      return;
+    }
+
+    // Permuta
+    if (det.esPermuta) {
+      const waT = `Hola Select Cars 👋\n\nNombre: ${mem.nombre}\nCelular: ${mem.celular}\n\nConsulta: Permuta / parte de pago de mi vehículo`;
+      await botSay(`Tomamos permutas 🔄 Podés usar tu auto actual como parte de pago.<br><br>El proceso es simple: nos mandás fotos y datos, lo cotizamos y te decimos cuánto te damos de crédito.<br><br>${waBtn(waLink(waT), 'Cotizar mi auto')}`, 1400);
+      return;
+    }
+
+    // Financiación
+    if (det.esFinanciacion) {
+      const waT = `Hola Select Cars 👋\n\nNombre: ${mem.nombre}\nCelular: ${mem.celular}\n\nConsulta: Financiación / cuotas`;
+      await botSay(`${pick(afirm)} Tenemos planes de financiación adaptados a cada cliente — cuotas fijas, anticipos variables, y opciones para distintos perfiles 💳<br><br>Lo mejor es que un asesor te arme la simulación exacta según el vehículo y lo que podés poner de entrada.<br><br>${waBtn(waLink(waT), 'Ver opciones de financiación')}`, 1600);
+      return;
+    }
+
+    // Recomendación por tipo
+    if (det.tipo) {
+      mem.vehiculoInteres = det.tipo;
+      const cards = recomendarVehiculos(det.tipo);
+      const waT = `Hola Select Cars 👋\n\nNombre: ${mem.nombre}\nCelular: ${mem.celular}\n\nBusco: vehículo ${det.tipo}\n${mem.financiacion ? 'Con financiación.' : ''}${mem.permuta ? ' Tengo auto para permutar.' : ''}`;
+
+      let intro = '';
+      if (det.tipo === 'suv')       intro = `Para ${nombre1 || 'vos'}, que buscás una SUV, tenemos estas opciones destacadas:`;
+      else if (det.tipo === 'pickup') intro = `Las pickups son de las más solicitadas 🔥 Te muestro lo mejor que tenemos:`;
+      else if (det.tipo === 'deportivo') intro = `Para los que buscan adrenalina 🏎️ — estas son nuestras joyas deportivas:`;
+      else if (det.tipo === 'familiar') intro = `Para la familia, lo más importante es espacio y confort. ${pick(trans)}`;
+      else if (det.tipo === 'electrico') intro = `El futuro ya llegó a Ushuaia ⚡ Tenemos la mejor oferta eléctrica:`;
+      else if (det.tipo === 'premium') intro = `Para quienes buscan lo mejor sin compromisos 🏆:`;
+
+      await botSay(`${intro}<br><br>${cards}<br><br>¿Alguno te llama la atención? O si querés, un asesor te muestra todo en detalle:<br><br>${waBtn(waLink(waT))}`, 1800);
+      return;
+    }
+
+    // Precios / disponibilidad
+    if (/precio|costo|valor|cuánto|cuanto|disponib/.test(t)) {
+      const waT = `Hola Select Cars 👋\n\nNombre: ${mem.nombre}\nCelular: ${mem.celular}\n\nConsulta: ${texto}`;
+      await botSay(`Los valores varían según modelo, año y equipamiento — y en Ushuaia tenemos precios competitivos por la zona franca 🛒<br><br>Lo más rápido es que un asesor te pase la lista actualizada con disponibilidad real:<br><br>${waBtn(waLink(waT), 'Consultar precios')}`, 1400);
+      return;
+    }
+
+    // Modelos específicos por nombre
+    if (/hilux/.test(t)) {
+      const waT = `Hola Select Cars 👋\n\nNombre: ${mem.nombre}\nCelular: ${mem.celular}\n\nConsulta sobre: Toyota Hilux`;
+      await botSay(`La Hilux es la número uno del mercado y tenemos unidades 🔥<br><br>Diesel o gasolera, simple o doble cabina, con o sin 4x4 — hay opciones para todos los usos.<br><br>Un asesor te muestra disponibilidad, versiones y precios en minutos:<br><br>${waBtn(waLink(waT), 'Ver Toyota Hilux')}`, 1500);
+      return;
+    }
+    if (/mercedes|glc|benz/.test(t)) {
+      const waT = `Hola Select Cars 👋\n\nNombre: ${mem.nombre}\nCelular: ${mem.celular}\n\nConsulta sobre: Mercedes-Benz`;
+      await botSay(`El GLC 300 es una de nuestras estrellas premium — tecnología alemana, confort total, y un nivel de equipamiento impresionante 🏆<br><br>${waBtn(waLink(waT), 'Ver Mercedes-Benz')}`, 1400);
+      return;
+    }
+    if (/byd|shark|yuan/.test(t)) {
+      const waT = `Hola Select Cars 👋\n\nNombre: ${mem.nombre}\nCelular: ${mem.celular}\n\nConsulta sobre: BYD`;
+      await botSay(`La línea BYD está revolucionando el mercado ⚡ La Yuan Plus y la Shark son de las más buscadas — relación precio/equipamiento imbatible.<br><br>${waBtn(waLink(waT), 'Ver línea BYD')}`, 1400);
+      return;
+    }
+    if (/gr.?86/.test(t)) {
+      const waT = `Hola Select Cars 👋\n\nNombre: ${mem.nombre}\nCelular: ${mem.celular}\n\nConsulta sobre: Toyota GR-86`;
+      await botSay(`El GR-86 es puro ADN deportivo 🏎️ Tracción trasera, motor atmosférico, caja manual — una experiencia que muy pocos autos dan hoy.<br><br>${waBtn(waLink(waT), 'Ver Toyota GR-86')}`, 1400);
+      return;
+    }
+
+    // Lead caliente → derivar rápido
+    if (mem.leadCaliente || det.leadCaliente) {
+      const waT = `Hola Select Cars 👋\n\nNombre: ${mem.nombre}\nCelular: ${mem.celular}\n\nConsulta urgente: ${texto}`;
+      await botSay(`${pick(acks)} ${nombre1 ? nombre1 + ', ' : ''}notamos que estás decidido — te conecto directamente con un asesor para que esto arranque hoy mismo 🔥<br><br>${waBtn(waLink(waT), 'Hablar ahora')}`, 1000);
+      return;
+    }
+
+    // Saludo
+    if (/^(hola|buenas|buen|hey|hi|hello|qué tal|como estas)/.test(t)) {
+      await botSay(`¡Hola${nombre1 ? ', ' + nombre1 : ''}! 👋 Acá estoy. ¿En qué te puedo ayudar?`, 700);
+      return;
+    }
+
+    // Respuesta genérica elegante
+    const waT = `Hola Select Cars 👋\n\nNombre: ${mem.nombre}\nCelular: ${mem.celular}\n\nConsulta: ${texto}`;
+    await botSay(`${pick(trans)} esa consulta la maneja mejor uno de nuestros asesores — tienen todos los datos actualizados de stock, precios y financiación 👇<br><br>${waBtn(waLink(waT))}`, 1200);
   }
 
-  function doSend(){
+  // ── APERTURA / CIERRE ─────────────────────────
+  function openChat() {
+    clearTimeout(proactiveTimer);
+    clearTimeout(proactiveTimer2);
+    tip.classList.remove('show');
+    badge.style.display = 'none';
+
+    box.classList.add('sc-opening');
+    box.classList.add('open');
+    btn.classList.add('sc-open');
+
+    setTimeout(() => box.classList.remove('sc-opening'), 400);
+
+    if (!initiated) {
+      initiated = true;
+      bienvenida();
+    } else {
+      scrollDown();
+    }
+    setTimeout(() => { input.focus(); scrollDown(); }, 200);
+  }
+
+  function closeChat() {
+    box.classList.remove('open');
+    btn.classList.remove('sc-open');
+  }
+
+  // ── ENVÍO ─────────────────────────────────────
+  async function doSend() {
     const text = input.value.trim();
-    if(!text) return;
-    userMsg(text);
+    if (!text || isTyping) return;
     input.value = '';
-    setTimeout(() => handleStep(text), 400);
+    input.style.height = 'auto';
+    userSay(text);
+    await responder(text);
   }
 
-  send.addEventListener('click', doSend);
-  input.addEventListener('keypress', e => { if(e.key === 'Enter') doSend(); });
+  // ── EVENT LISTENERS ───────────────────────────
+  btn.addEventListener('click', e => { e.stopPropagation(); openChat(); });
+  closeBtn.addEventListener('click', closeChat);
+  tipX.addEventListener('click', e => { e.stopPropagation(); tip.classList.remove('show'); });
+
+  // Cerrar al click fuera
+  document.addEventListener('click', e => {
+    if (box.classList.contains('open') && !box.contains(e.target) && !btn.contains(e.target)) closeChat();
+  });
+  box.addEventListener('click', e => e.stopPropagation());
+
+  // Enviar con Enter (Shift+Enter = salto de línea)
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); }
+  });
+  sendBtn.addEventListener('click', doSend);
+
+  // Auto-resize textarea
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+  });
+
+  // Chips rápidos
+  chips.forEach(c => {
+    c.addEventListener('click', () => {
+      if (!box.classList.contains('open')) openChat();
+      const msg = c.dataset.msg;
+      setTimeout(async () => {
+        if (!initiated) { initiated = true; await bienvenida(); return; }
+        if (fase === 'nombre' || fase === 'celular') return; // esperar que complete registro
+        userSay(msg);
+        await responder(msg);
+      }, initiated ? 0 : 100);
+    });
+  });
+
+  // ── Mobile keyboard: pegar chat al teclado ───
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      if (!box.classList.contains('open') || window.innerWidth > 500) return;
+      const vv = window.visualViewport;
+      const kb = Math.max(window.innerHeight - vv.height - vv.offsetTop, 0);
+      box.style.bottom = kb + 'px';
+      box.style.height = Math.min(vv.height * 0.9, 650) + 'px';
+      scrollDown();
+    });
+  }
+
+  // ── TOOLTIP PROACTIVO ─────────────────────────
+  startProactive();
+
 })();
 </script>
 
@@ -1499,9 +1883,6 @@ footer{
   </a>
   <ul class="nav-links">
     <li><a href="#vehicles">Vehículos</a></li>
-    <li><a href="#services">Servicios</a></li>
-    <li><a href="#why">Nosotros</a></li>
-    <li><a href="#testimonials">Clientes</a></li>
     <li><a href="#location">Ubicación</a></li>
   </ul>
   <a href="https://wa.me/5492901606291?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo." class="nav-wa" target="_blank" rel="noopener">
@@ -1516,13 +1897,456 @@ footer{
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mob">
   <a href="#vehicles" onclick="closeMob()">Vehículos</a>
-  <a href="#services" onclick="closeMob()">Servicios</a>
-  <a href="#why" onclick="closeMob()">Nosotros</a>
-  <a href="#testimonials" onclick="closeMob()">Clientes</a>
   <a href="#location" onclick="closeMob()">Ubicación</a>
   <a href="#" onclick="closeMob();openSoldGallery();return false;">Unidades Vendidas</a>
+  <a href="#" onclick="closeMob();openQuienesSomos();return false;">Quiénes Somos</a>
+  <a href="#" onclick="closeMob();openFaq();return false;">Preguntas Frecuentes</a>
   <a href="https://wa.me/5492901606291?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo." target="_blank" rel="noopener" style="color:var(--blue)">WhatsApp →</a>
 </div>
+
+<!-- ═══ QUIÉNES SOMOS OVERLAY ═══ -->
+<div id="qs-overlay">
+  <div id="qs-box">
+    <div id="qs-header">
+      <div id="qs-title">
+        <span class="qs-lbl">JS Select Cars</span>
+        <span class="qs-h">Quiénes Somos</span>
+      </div>
+      <button id="qs-close" onclick="closeQuienesSomos()" aria-label="Cerrar">✕</button>
+    </div>
+    <div id="qs-content">
+
+      <div class="qs-hero">
+        <div class="qs-hero-tag">Desde Ushuaia para todo el país</div>
+        <h2 class="qs-hero-title">Vehículos seleccionados.<br>Atención sin igual.</h2>
+        <p class="qs-hero-sub">Somos JS Select Cars, una concesionaria premium ubicada en el corazón de Ushuaia, Tierra del Fuego. Nos especializamos en la compra, venta y consignación de vehículos seleccionados, con un servicio personalizado que prioriza la confianza y la transparencia.</p>
+      </div>
+
+      <div class="qs-pillars">
+        <div class="qs-pillar">
+          <div class="qs-pillar-icon">🎯</div>
+          <div class="qs-pillar-title">Nuestra misión</div>
+          <div class="qs-pillar-desc">Conectar a cada cliente con el vehículo ideal, ofreciendo una experiencia de compra sin presión, con información clara y total acompañamiento.</div>
+        </div>
+        <div class="qs-pillar">
+          <div class="qs-pillar-icon">🏆</div>
+          <div class="qs-pillar-title">Nuestra visión</div>
+          <div class="qs-pillar-desc">Ser la concesionaria de referencia en la Patagonia, reconocida por la calidad de sus vehículos y la excelencia de su atención.</div>
+        </div>
+        <div class="qs-pillar">
+          <div class="qs-pillar-icon">🤝</div>
+          <div class="qs-pillar-title">Nuestros valores</div>
+          <div class="qs-pillar-desc">Honestidad, transparencia y compromiso con cada cliente. Nada de letra chica, nada de sorpresas.</div>
+        </div>
+      </div>
+
+      <div class="qs-divider"></div>
+
+      <div class="qs-section-title">Por qué elegirnos</div>
+      <div class="qs-benefits">
+        <div class="qs-benefit"><span class="qs-check">✓</span> Stock seleccionado y verificado</div>
+        <div class="qs-benefit"><span class="qs-check">✓</span> Financiación a medida sin trámites complicados</div>
+        <div class="qs-benefit"><span class="qs-check">✓</span> Permutas y consignación sin costo anticipado</div>
+        <div class="qs-benefit"><span class="qs-check">✓</span> Asesoramiento personalizado sin presión de venta</div>
+        <div class="qs-benefit"><span class="qs-check">✓</span> Atención directa con el dueño del negocio</div>
+        <div class="qs-benefit"><span class="qs-check">✓</span> Zona franca: precios competitivos únicos en la región</div>
+        <div class="qs-benefit"><span class="qs-check">✓</span> Documentación al día y vehículos sin deudas</div>
+        <div class="qs-benefit"><span class="qs-check">✓</span> Más de 10 años de experiencia en el mercado automotriz</div>
+      </div>
+
+      <div class="qs-divider"></div>
+
+      <div class="qs-section-title">Dónde estamos</div>
+      <div class="qs-info-grid">
+        <div class="qs-info-item">
+          <div class="qs-info-label">📍 Dirección</div>
+          <div class="qs-info-val">Ushuaia, Tierra del Fuego, Argentina</div>
+        </div>
+        <div class="qs-info-item">
+          <div class="qs-info-label">📞 WhatsApp</div>
+          <div class="qs-info-val">+54 9 2901 606291</div>
+        </div>
+        <div class="qs-info-item">
+          <div class="qs-info-label">🕐 Horarios</div>
+          <div class="qs-info-val">Lunes a sábado · 9:00 a 19:00 hs</div>
+        </div>
+        <div class="qs-info-item">
+          <div class="qs-info-label">🌐 Zona</div>
+          <div class="qs-info-val">Zona Franca · Tierra del Fuego</div>
+        </div>
+      </div>
+
+      <a href="https://wa.me/5492901606291?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20JS%20Select%20Cars." target="_blank" rel="noopener" class="qs-wa-btn">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contactarnos por WhatsApp
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PREGUNTAS FRECUENTES OVERLAY ═══ -->
+<div id="faq-overlay">
+  <div id="faq-box">
+    <div id="faq-header">
+      <div id="faq-title">
+        <span class="qs-lbl">JS Select Cars</span>
+        <span class="qs-h">Preguntas Frecuentes</span>
+      </div>
+      <button id="faq-close" onclick="closeFaq()" aria-label="Cerrar">✕</button>
+    </div>
+    <div id="faq-content">
+
+      <div class="faq-intro">Todo lo que necesitás saber antes de tomar tu decisión 🚘</div>
+
+      <div class="faq-list">
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Cómo funciona la consignación?
+            <span class="faq-arrow">›</span>
+          </button>
+          <div class="faq-a">Dejás tu vehículo en nuestro local sin pagar nada por adelantado. Nosotros nos encargamos de la publicación, las visitas y la venta. Una vez vendido, recibís el dinero acordado. Simple, transparente y sin riesgos.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Hacen permuta (parte de pago)?
+            <span class="faq-arrow">›</span>
+          </button>
+          <div class="faq-a">Sí. Podés usar tu vehículo actual como parte de pago para la compra de uno nuevo. Valuamos tu auto de forma justa y transparente, y aplicamos ese valor al precio del vehículo que elegís.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Tienen opciones de financiación?
+            <span class="faq-arrow">›</span>
+          </button>
+          <div class="faq-a">Sí, trabajamos con distintas opciones de financiación según el perfil del cliente, el vehículo y el anticipo disponible. Los planes se arman a medida — cuotas fijas, sin sorpresas. Consultanos por WhatsApp para una simulación personalizada.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Los vehículos tienen garantía?
+            <span class="faq-arrow">›</span>
+          </button>
+          <div class="faq-a">Todos los vehículos están verificados antes de estar en stock. Para unidades con garantía de fábrica vigente, la misma se transfiere al nuevo titular. Para otros casos, podemos gestionar coberturas adicionales. Consultá caso por caso.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Qué ventaja tiene comprar en Ushuaia (Zona Franca)?
+            <span class="faq-arrow">›</span>
+          </button>
+          <div class="faq-a">Tierra del Fuego es Zona Franca, lo que permite acceder a determinados vehículos con precios más competitivos respecto al resto del país. Es una ventaja real que trasladamos directamente a nuestros clientes.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Puedo comprar desde otra provincia?
+            <span class="faq-arrow">›</span>
+          </button>
+          <div class="faq-a">Sí. Atendemos clientes de todo el país. El proceso puede iniciarse de forma remota por WhatsApp, coordinando la documentación y el traslado del vehículo. Nuestros asesores te guían en cada paso.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Cómo sé que el vehículo no tiene deudas ni problemas legales?
+            <span class="faq-arrow">›</span>
+          </button>
+          <div class="faq-a">Antes de incorporar cualquier unidad a nuestro stock, verificamos que esté libre de prendas, multas y deudas. Al momento de la transferencia, el vehículo está 100% en regla. Transparencia total, siempre.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Cuánto tarda el trámite de transferencia?
+            <span class="faq-arrow">›</span>
+          </button>
+          <div class="faq-a">En condiciones normales, la transferencia se gestiona en pocos días hábiles. Nos encargamos de todo el papeleo para que vos solo te preocupés de manejar tu nuevo vehículo.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Puedo ver los vehículos en persona antes de comprar?
+            <span class="faq-arrow">›</span>
+          </button>
+          <div class="faq-a">Por supuesto. Podés coordinar una visita al local en Ushuaia para ver el vehículo, hacer una prueba de manejo y resolver todas tus dudas en persona con uno de nuestros asesores.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            ¿Cómo me contacto con un asesor?
+            <span class="faq-arrow">›</span>
+          </button>
+          <div class="faq-a">La forma más rápida es por WhatsApp al +54 9 2901 606291. También podés usar el chat de esta página o visitarnos directamente en Ushuaia. Respondemos en minutos.</div>
+        </div>
+
+      </div>
+
+      <a href="https://wa.me/5492901606291?text=Hola!%20Tengo%20una%20consulta%20sobre%20un%20veh%C3%ADculo." target="_blank" rel="noopener" class="qs-wa-btn">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        ¿Otra pregunta? Escribinos
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<style>
+/* ═══ QUIÉNES SOMOS & FAQ — ESTILOS COMPARTIDOS ═══ */
+#qs-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(5,5,5,.88);
+  backdrop-filter: blur(20px);
+  display: flex; align-items: flex-start; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+#qs-overlay::before {
+  content: '';
+  position: fixed; inset: 0; z-index: -1;
+  background: url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779255628/IMG_6806_h6vxdd.jpg') center/cover no-repeat;
+  opacity: .18;
+}
+#faq-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(5,5,5,.88);
+  backdrop-filter: blur(20px);
+  display: flex; align-items: flex-start; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+#faq-overlay::before {
+  content: '';
+  position: fixed; inset: 0; z-index: -1;
+  background: url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779255740/IMG_6807_yuuobb.jpg') center/cover no-repeat;
+  opacity: .18;
+}
+#qs-overlay.open, #faq-overlay.open { opacity: 1; pointer-events: all; }
+
+#qs-box, #faq-box {
+  width: 100%; max-width: 760px;
+  padding: 0 0 80px; min-height: 100%;
+}
+
+#qs-header, #faq-header {
+  position: sticky; top: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px 28px 18px;
+  background: rgba(5,5,5,.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+#qs-title, #faq-title { display: flex; flex-direction: column; gap: 2px; }
+.qs-lbl { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--blue); }
+.qs-h {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px; letter-spacing: 2px; color: var(--white); line-height: 1;
+}
+#qs-close, #faq-close {
+  background: rgba(255,255,255,.07); border: none; color: var(--white);
+  width: 44px; height: 44px; border-radius: 50%; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s; flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#qs-close:hover, #faq-close:hover { background: rgba(255,255,255,.15); }
+
+/* ── Quiénes somos ── */
+#qs-content { padding: 0 28px; }
+
+.qs-hero {
+  padding: 52px 0 40px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  margin-bottom: 44px;
+}
+.qs-hero-tag {
+  font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--blue); margin-bottom: 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.qs-hero-tag::before { content:''; display:block; width:24px; height:1px; background:var(--blue); }
+.qs-hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 6vw, 60px);
+  line-height: .95; letter-spacing: 1.5px;
+  color: var(--white); margin-bottom: 22px;
+}
+.qs-hero-sub {
+  font-size: 15px; font-weight: 300;
+  color: rgba(245,247,250,.55); line-height: 1.85;
+  max-width: 580px;
+}
+
+.qs-pillars {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+  margin-bottom: 44px;
+}
+@media(max-width:600px){ .qs-pillars { grid-template-columns: 1fr; } }
+.qs-pillar {
+  padding: 28px 24px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 4px;
+  transition: border-color .3s, background .3s;
+}
+.qs-pillar:hover { border-color: rgba(37,99,235,.3); background: rgba(37,99,235,.05); }
+.qs-pillar-icon { font-size: 26px; margin-bottom: 14px; }
+.qs-pillar-title { font-size: 13px; font-weight: 500; letter-spacing: .3px; margin-bottom: 10px; color: var(--white); }
+.qs-pillar-desc { font-size: 13px; font-weight: 300; color: rgba(245,247,250,.48); line-height: 1.75; }
+
+.qs-divider { height: 1px; background: rgba(255,255,255,.07); margin: 36px 0; }
+
+.qs-section-title {
+  font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--blue); margin-bottom: 22px;
+  display: flex; align-items: center; gap: 12px;
+}
+.qs-section-title::before { content:''; display:block; width:20px; height:1px; background:var(--blue); }
+
+.qs-benefits {
+  display: grid; grid-template-columns: repeat(2,1fr); gap: 12px;
+  margin-bottom: 44px;
+}
+@media(max-width:500px){ .qs-benefits { grid-template-columns: 1fr; } }
+.qs-benefit {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14px; font-weight: 300; color: rgba(245,247,250,.7);
+  line-height: 1.5;
+}
+.qs-check {
+  color: var(--blue); font-weight: 700; flex-shrink: 0; margin-top: 1px;
+}
+
+.qs-info-grid {
+  display: grid; grid-template-columns: repeat(2,1fr); gap: 16px;
+  margin-bottom: 44px;
+}
+@media(max-width:500px){ .qs-info-grid { grid-template-columns: 1fr; } }
+.qs-info-item {
+  padding: 18px 20px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 4px;
+}
+.qs-info-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--blue); margin-bottom: 6px; }
+.qs-info-val { font-size: 14px; font-weight: 300; color: rgba(245,247,250,.75); }
+
+.qs-wa-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: white; text-decoration: none;
+  padding: 16px 32px; border-radius: 3px;
+  font-size: 13px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
+  transition: box-shadow .3s, transform .2s;
+  box-shadow: 0 4px 20px rgba(37,211,102,.25);
+}
+.qs-wa-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(37,211,102,.4); }
+.qs-wa-btn svg { width: 18px; height: 18px; fill: white; flex-shrink: 0; }
+
+/* ── FAQ ── */
+#faq-content { padding: 32px 28px; }
+
+.faq-intro {
+  font-size: 15px; font-weight: 300;
+  color: rgba(245,247,250,.5); line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.faq-list { display: flex; flex-direction: column; gap: 2px; margin-bottom: 44px; }
+
+.faq-item {
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 3px; overflow: hidden;
+  transition: border-color .3s;
+}
+.faq-item:hover { border-color: rgba(37,99,235,.22); }
+
+.faq-q {
+  width: 100%; background: rgba(255,255,255,.03);
+  border: none; color: var(--white);
+  padding: 18px 20px; text-align: left;
+  font-size: 14px; font-weight: 400; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+  gap: 16px; transition: background .2s; line-height: 1.4;
+  -webkit-tap-highlight-color: transparent;
+}
+.faq-q:hover { background: rgba(37,99,235,.06); }
+.faq-q.open { background: rgba(37,99,235,.08); color: var(--white); }
+
+.faq-arrow {
+  font-size: 22px; color: var(--blue); flex-shrink: 0;
+  transition: transform .3s; line-height: 1;
+}
+.faq-q.open .faq-arrow { transform: rotate(90deg); }
+
+.faq-a {
+  max-height: 0; overflow: hidden;
+  font-size: 13.5px; font-weight: 300;
+  color: rgba(245,247,250,.55); line-height: 1.8;
+  transition: max-height .4s cubic-bezier(.4,0,.2,1), padding .4s;
+  padding: 0 20px; background: rgba(0,0,0,.2);
+}
+.faq-a.open { max-height: 300px; padding: 16px 20px; }
+
+@media(max-width:500px){
+  #qs-content, #faq-content { padding: 24px 16px; }
+  #qs-header, #faq-header { padding: 18px 16px 14px; }
+  .qs-hero { padding: 36px 0 28px; }
+}
+</style>
+
+<script>
+// ── QUIÉNES SOMOS ─────────────────────────────
+function openQuienesSomos(){
+  document.getElementById('qs-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeQuienesSomos(){
+  document.getElementById('qs-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('qs-overlay').addEventListener('click', function(e){
+  if(e.target === this) closeQuienesSomos();
+});
+
+// ── FAQ ───────────────────────────────────────
+function openFaq(){
+  document.getElementById('faq-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeFaq(){
+  document.getElementById('faq-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('faq-overlay').addEventListener('click', function(e){
+  if(e.target === this) closeFaq();
+});
+
+function toggleFaq(btn){
+  const item = btn.parentElement;
+  const ans  = item.querySelector('.faq-a');
+  const isOpen = btn.classList.contains('open');
+  // cerrar todos
+  document.querySelectorAll('.faq-q.open').forEach(b => {
+    b.classList.remove('open');
+    b.parentElement.querySelector('.faq-a').classList.remove('open');
+  });
+  if(!isOpen){
+    btn.classList.add('open');
+    ans.classList.add('open');
+  }
+}
+
+// Cerrar con Escape
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    closeQuienesSomos();
+    closeFaq();
+  }
+});
+</script>
 
 <!-- ═══ UNIDADES VENDIDAS GALLERY OVERLAY ═══ -->
 <div id="sold-gallery-overlay">
@@ -1845,7 +2669,7 @@ self.addEventListener('fetch',e=>{
     <!-- Card 1 - Toyota Hilux SRV -->
     <div class="vcard rv" id="vcard-0">
       <div class="vcard-photo-col">
-        <div class="vcard-photo" id="vcard-photo-0" style="background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236895/IMG_6793_deapou.jpg')"></div>
+        <div class="vcard-photo" id="vcard-photo-0" style="background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289503/IMG_6793_deapou_11faaa.jpg')"></div>
         <span class="vcard-photo-badge">Nuevo ingreso</span>
         <button class="vcard-arrow prev" onclick="cardNav(event,0,-1)">&#8592;</button>
         <button class="vcard-arrow next" onclick="cardNav(event,0,1)">&#8594;</button>
@@ -1869,7 +2693,7 @@ self.addEventListener('fetch',e=>{
     <!-- Card 2 - BYD Shark -->
     <div class="vcard rv" id="vcard-1">
       <div class="vcard-photo-col">
-        <div class="vcard-photo" id="vcard-photo-1" style="background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236897/IMG_6740_zmuleb.jpg')"></div>
+        <div class="vcard-photo" id="vcard-photo-1" style="background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289573/IMG_6740_zmuleb_11faaa.jpg')"></div>
         <span class="vcard-photo-badge">Destacado</span>
         <button class="vcard-arrow prev" onclick="cardNav(event,1,-1)">&#8592;</button>
         <button class="vcard-arrow next" onclick="cardNav(event,1,1)">&#8594;</button>
@@ -1893,7 +2717,7 @@ self.addEventListener('fetch',e=>{
     <!-- Card 3 - BYD Yuan Pro -->
     <div class="vcard rv" id="vcard-2">
       <div class="vcard-photo-col">
-        <div class="vcard-photo" id="vcard-photo-2" style="background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236893/IMG_6751_dq1obk.jpg')"></div>
+        <div class="vcard-photo" id="vcard-photo-2" style="background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289536/IMG_6751_dq1obk_11faaa.jpg')"></div>
         <span class="vcard-photo-badge">Nuevo ingreso</span>
         <button class="vcard-arrow prev" onclick="cardNav(event,2,-1)">&#8592;</button>
         <button class="vcard-arrow next" onclick="cardNav(event,2,1)">&#8594;</button>
@@ -1917,7 +2741,7 @@ self.addEventListener('fetch',e=>{
     <!-- Card 4 - Toyota GR-86 -->
     <div class="vcard rv" id="vcard-3">
       <div class="vcard-photo-col">
-        <div class="vcard-photo" id="vcard-photo-3" style="background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236900/IMG_6782_sofkvc.jpg')"></div>
+        <div class="vcard-photo" id="vcard-photo-3" style="background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289471/IMG_6782_sofkvc_11faaa.jpg')"></div>
         <span class="vcard-photo-badge">Deportivo</span>
         <button class="vcard-arrow prev" onclick="cardNav(event,3,-1)">&#8592;</button>
         <button class="vcard-arrow next" onclick="cardNav(event,3,1)">&#8594;</button>
@@ -1941,7 +2765,7 @@ self.addEventListener('fetch',e=>{
     <!-- Card 5 - Mercedes Benz GLC 300 -->
     <div class="vcard rv" id="vcard-4">
       <div class="vcard-photo-col">
-        <div class="vcard-photo" id="vcard-photo-4" style="background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236884/IMG_6772_bxxrnw.jpg')"></div>
+        <div class="vcard-photo" id="vcard-photo-4" style="background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779287651/copy_of_img_6772_bxxrnw.jpg')"></div>
         <span class="vcard-photo-badge">Premium</span>
         <button class="vcard-arrow prev" onclick="cardNav(event,4,-1)">&#8592;</button>
         <button class="vcard-arrow next" onclick="cardNav(event,4,1)">&#8594;</button>
@@ -2347,18 +3171,18 @@ const vehicles = [
   {
     badge:'Nuevo ingreso',
     name:'Toyota Hilux SRV',
-    photo:'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236895/IMG_6793_deapou.jpg',
+    photo:'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289503/IMG_6793_deapou_11faaa.jpg',
     gallery:[
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236895/IMG_6793_deapou.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236891/IMG_6794_lq841f.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236890/IMG_6795_jlmr01.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236888/IMG_6796_u1hhrt.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236892/IMG_6797_bi3gyg.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236891/IMG_6798_r7ec03.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236899/IMG_6799_jdjaqr.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236892/IMG_6800_wngqt9.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236890/IMG_6801_j8mdok.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236884/IMG_6802_pxujuy.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289503/IMG_6793_deapou_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289508/IMG_6794_lq841f_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289511/IMG_6795_jlmr01_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289513/IMG_6796_u1hhrt_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289516/IMG_6797_bi3gyg_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289519/IMG_6798_r7ec03_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289521/IMG_6799_jdjaqr_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289526/IMG_6800_wngqt9_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289530/IMG_6801_j8mdok_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289532/IMG_6802_pxujuy_11faaa.jpg',
     ],
     año:'2024', km:'39.000 km', transmision:'Automática 6vel', combustible:'Diésel 2.8T', color:'—', puertas:'4',
     features:['Motor 2.8 Turbo Diesel (204hp)','Caja Automática de 6 velocidades','Tracción 4x4','Interior Premium','Pantalla multimedia + conectividad','Cámara de retroceso y sensor 360°','Climatizador automático bi zona','Toyota Safety Sense'],
@@ -2369,18 +3193,18 @@ const vehicles = [
   {
     badge:'Destacado',
     name:'BYD Shark',
-    photo:'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236897/IMG_6740_zmuleb.jpg',
+    photo:'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289573/IMG_6740_zmuleb_11faaa.jpg',
     gallery:[
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236897/IMG_6740_zmuleb.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236896/IMG_6742_resad9.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236896/IMG_6743_kdlikn.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236896/IMG_6744_cvtwrl.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236895/IMG_6745_nnetiy.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236895/IMG_6746_r6ecuy.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236894/IMG_6747_kw8xw5.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236894/IMG_6748_stgukw.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236894/IMG_6749_vpqgdy.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236892/IMG_6750_em7b00.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289573/IMG_6740_zmuleb_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289577/IMG_6742_resad9_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289580/IMG_6743_kdlikn_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289585/IMG_6744_cvtwrl_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289589/IMG_6745_nnetiy_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289592/IMG_6746_r6ecuy_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289595/IMG_6747_kw8xw5_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289600/IMG_6748_stgukw_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289603/IMG_6749_vpqgdy_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289606/IMG_6750_em7b00_11faaa.jpg',
     ],
     año:'2026', km:'0 km', transmision:'Híbrido enchufable DM-O', combustible:'Híbrido', color:'—', puertas:'4',
     features:['Tecnología híbrida enchufable DM-O','+430 CV combinados aprox.','4x4 inteligente','0-100 km/h en 5.7 seg','Modo eléctrico + autonomía extendida','Pantalla multimedia giratoria BYD','Apple CarPlay y Android Auto','Interior Premium','Ópticas Full LED','Asistencias avanzadas de manejo','Cámaras 360°','Potencia de Pick-Up + Eficiencia eléctrica'],
@@ -2391,18 +3215,18 @@ const vehicles = [
   {
     badge:'Nuevo ingreso',
     name:'BYD Yuan Pro',
-    photo:'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236893/IMG_6751_dq1obk.jpg',
+    photo:'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289536/IMG_6751_dq1obk_11faaa.jpg',
     gallery:[
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236893/IMG_6751_dq1obk.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236892/IMG_6752_ioiocn.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236891/IMG_6753_ojqlsj.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236889/IMG_6754_tihnwc.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236890/IMG_6755_spafh6.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236889/IMG_6756_o2knwu.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236889/IMG_6757_yxqjsl.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236889/IMG_6758_jytg65.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236888/IMG_6759_mhoidk.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236887/IMG_6760_gnmeam.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289536/IMG_6751_dq1obk_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289541/IMG_6752_ioiocn_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289545/IMG_6753_ojqlsj_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289549/IMG_6754_tihnwc_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289553/IMG_6755_spafh6_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289557/IMG_6756_o2knwu_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289561/IMG_6757_yxqjsl_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289564/IMG_6758_jytg65_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289566/IMG_6759_mhoidk_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289570/IMG_6760_gnmeam_11faaa.jpg',
     ],
     año:'2026', km:'0 km', transmision:'Eléctrico', combustible:'Eléctrico', color:'—', puertas:'5',
     features:['100% Eléctrica','Batería Blade BYD','Potencia instantánea','Pantalla multimedia giratoria','Apple CarPlay y Android Auto','Interior premium y tecnológico','Climatizador automático','Acceso y arranque inteligente','Ópticas Full LED','Asistencias de conducción','Cero emisiones','Ideal para ciudad y ruta'],
@@ -2413,18 +3237,18 @@ const vehicles = [
   {
     badge:'Deportivo',
     name:'Toyota GR-86',
-    photo:'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236900/IMG_6782_sofkvc.jpg',
+    photo:'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289471/IMG_6782_sofkvc_11faaa.jpg',
     gallery:[
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236900/IMG_6782_sofkvc.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236898/IMG_6783_phm5la.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236897/IMG_6784_txqwpa.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236898/IMG_6785_djf9gu.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236898/IMG_6786_cxpfmr.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236897/IMG_6787_qp4zu1.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236895/IMG_6788_rwp3lg.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236895/IMG_6790_tawlj8.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236896/IMG_6791_lusb3w.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236898/IMG_6792_oxwqx3.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289471/IMG_6782_sofkvc_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289474/IMG_6783_phm5la_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289476/IMG_6784_txqwpa_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289479/IMG_6785_djf9gu_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289482/IMG_6786_cxpfmr_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289485/IMG_6787_qp4zu1_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289490/IMG_6789_yjjuj9_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289494/IMG_6790_tawlj8_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289497/IMG_6791_lusb3w_11faaa.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289501/IMG_6792_oxwqx3_11faaa.jpg',
     ],
     año:'2026', km:'2.200 km', transmision:'Manual 6 velocidades', combustible:'Nafta', color:'—', puertas:'2',
     features:['Motor Boxer 2.4','Caja manual de 6 velocidades','Tracción trasera RWD','Modo Sport','Escape deportivo','Butacas deportivas GR','Frenos Brembo','Apple CarPlay y Android Auto','Ópticas Full LED','Llantas deportivas','Diseño agresivo y manejo puro'],
@@ -2435,18 +3259,18 @@ const vehicles = [
   {
     badge:'Premium',
     name:'Mercedes Benz GLC 300',
-    photo:'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236884/IMG_6772_bxxrnw.jpg',
+    photo:'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779287651/copy_of_img_6772_bxxrnw.jpg',
     gallery:[
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236884/IMG_6772_bxxrnw.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236901/IMG_6773_ojfhs4.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236902/IMG_6774_sa4iwl.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236900/IMG_6775_nf8kec.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236900/IMG_6776_xymwlv.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236899/IMG_6777_trcwev.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236900/IMG_6778_jwd46f.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236899/IMG_6779_ndogg4.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236902/IMG_6780_qeicdx.jpg',
-      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236899/IMG_6781_cpen25.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779287651/copy_of_img_6772_bxxrnw.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779288285/copy_of_img_6773_ojfhs4.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779288540/IMG_6774_sa4iwl_444cf3.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779288543/IMG_6775_nf8kec_444cf3.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779288546/IMG_6776_xymwlv_444cf3.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779288548/IMG_6777_trcwev_444cf3.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779288552/IMG_6778_jwd46f_444cf3.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779288554/IMG_6779_ndogg4_444cf3.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779288558/IMG_6780_qeicdx_444cf3.jpg',
+      'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779288562/IMG_6781_cpen25_444cf3.jpg',
     ],
     año:'2017', km:'70.000 km', transmision:'Automática 9G-Tronic', combustible:'Nafta Turbo', color:'—', puertas:'5',
     features:['Motor 2.0 Turbo','Tracción integral 4Matic','Caja automática 9G-Tronic','Interior en cuero premium','Butacas eléctricas con memoria','Techo panorámico','Sistema de sonido Premium','Conectividad multimedia','Climatizador bi-zona','Ópticas LED Intelligent Light','Acceso y arranque Keyless','Asistencias de manejo Mercedes'],
