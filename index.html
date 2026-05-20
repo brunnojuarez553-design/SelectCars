@@ -147,18 +147,25 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
 .hamburger.open span:nth-child(2){opacity:0}
 .hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 .mobile-menu{
-  position:fixed;top:72px;left:0;right:0;
-  background:rgba(5,5,5,.97);backdrop-filter:blur(24px);
-  padding:32px 40px;z-index:999;
-  display:none;flex-direction:column;gap:24px;
-  border-bottom:1px solid rgba(255,255,255,.06);
+  position:fixed;top:72px;right:0;
+  width:240px;
+  background:rgba(5,5,5,.98);backdrop-filter:blur(24px);
+  padding:24px 28px 28px;z-index:999;
+  display:flex;flex-direction:column;gap:0;
+  border:1px solid rgba(255,255,255,.08);
+  border-top:none;
+  border-radius:0 0 0 6px;
+  transform:translateX(110%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
 }
-.mobile-menu.open{display:flex}
+.mobile-menu.open{transform:translateX(0);display:flex}
 .mobile-menu a{
-  color:rgba(245,247,250,.7);text-decoration:none;
-  font-size:14px;letter-spacing:2px;text-transform:uppercase;
-  transition:color .3s;
+  color:rgba(245,247,250,.65);text-decoration:none;
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  transition:color .2s;padding:13px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);
 }
+.mobile-menu a:last-child{border-bottom:none}
 .mobile-menu a:hover{color:var(--white)}
 
 /* ─── HERO VIDEO ────────────────────────────────────────────── */
@@ -856,6 +863,136 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
 }
 .open-map:hover{box-shadow:0 0 20px var(--blue-glow)}
 
+/* ─── FORMULARIO CONSULTA ─────────────────────────────────────── */
+#contact-form {
+  background: var(--black);
+  border-top: 1px solid rgba(255,255,255,.06);
+  padding: 120px 80px;
+}
+.cf-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: start;
+}
+.cf-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(42px, 5vw, 68px); letter-spacing: 2px;
+  color: var(--white); line-height: 1; margin-bottom: 20px;
+}
+.cf-sub {
+  font-size: 15px; font-weight: 300; line-height: 1.75;
+  color: rgba(245,247,250,.55); margin-bottom: 36px;
+}
+.cf-features { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+.cf-feat {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 13px; color: rgba(245,247,250,.65); letter-spacing: .5px;
+}
+.cf-feat-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--blue); flex-shrink: 0;
+  box-shadow: 0 0 8px var(--blue-glow);
+}
+.cf-divider { height: 1px; background: rgba(255,255,255,.07); margin-bottom: 32px; }
+.cf-contact-row {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 13px; color: rgba(245,247,250,.45);
+}
+.cf-contact-row svg { width: 16px; height: 16px; stroke: var(--blue); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.cf-contact-row a { color: var(--blue); text-decoration: none; font-weight: 500; }
+.cf-contact-row a:hover { text-decoration: underline; }
+
+/* Card */
+.cf-card {
+  background: rgba(12,26,46,.6);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 6px;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+
+/* Tabs */
+.cf-tabs {
+  display: grid; grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.cf-tab {
+  padding: 18px; background: none; border: none; cursor: pointer;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(245,247,250,.4); font-weight: 500;
+  transition: color .2s, background .2s;
+  position: relative;
+}
+.cf-tab::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; background: var(--blue);
+  transform: scaleX(0); transition: transform .25s var(--ease);
+}
+.cf-tab.active { color: var(--white); background: rgba(37,99,235,.06); }
+.cf-tab.active::after { transform: scaleX(1); }
+.cf-tab:hover:not(.active) { color: rgba(245,247,250,.7); }
+
+/* Form body */
+.cf-form { padding: 32px; display: flex; flex-direction: column; gap: 20px; }
+.cf-field { display: flex; flex-direction: column; gap: 8px; }
+.cf-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cf-label {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(245,247,250,.45); font-weight: 500;
+}
+.cf-req { color: var(--blue); }
+.cf-input {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 3px;
+  padding: 12px 14px;
+  color: var(--white); font-size: 14px; font-weight: 300;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+  font-family: inherit; width: 100%; box-sizing: border-box;
+}
+.cf-input::placeholder { color: rgba(245,247,250,.25); }
+.cf-input:focus {
+  border-color: rgba(37,99,235,.6);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+}
+.cf-select { appearance: none; cursor: pointer; }
+.cf-select option { background: #0c1a2e; color: var(--white); }
+.cf-textarea { resize: vertical; min-height: 80px; }
+.cf-radio-group { display: flex; flex-direction: column; gap: 10px; }
+.cf-radio {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: rgba(245,247,250,.6); cursor: pointer;
+}
+.cf-radio input[type="radio"] { accent-color: var(--blue); width: 15px; height: 15px; flex-shrink: 0; }
+
+/* Submit */
+.cf-submit {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: var(--blue); color: var(--white);
+  border: none; border-radius: 3px; cursor: pointer;
+  padding: 16px 24px; margin-top: 4px;
+  font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 600;
+  font-family: inherit; transition: box-shadow .3s, transform .2s;
+}
+.cf-submit svg { width: 15px; height: 15px; stroke: white; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.cf-submit:hover { box-shadow: 0 0 32px var(--blue-glow); transform: translateY(-1px); }
+.cf-submit:active { transform: translateY(0); }
+.cf-disclaimer {
+  font-size: 11px; color: rgba(245,247,250,.3); text-align: center;
+  line-height: 1.6; margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 860px) {
+  #contact-form { padding: 72px 20px; }
+  .cf-inner { grid-template-columns: 1fr; gap: 52px; }
+  .cf-field-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  #contact-form { padding: 56px 16px; }
+  .cf-form { padding: 24px 20px; }
+  .cf-title { font-size: 44px; }
+}
+
 /* ─── FOOTER ─────────────────────────────────────────────────── */
 footer{
   background:var(--black);
@@ -923,7 +1060,7 @@ footer{
 /* ── TABLET ── */
 @media(max-width:860px){
   nav{padding:0 20px;height:64px}
-  .mobile-menu{top:64px}
+  .mobile-menu{top:64px;padding:20px 24px 24px}
 
   .sec{padding:64px 20px}
   .sec-h2{margin-bottom:16px}
@@ -979,7 +1116,7 @@ footer{
     background-attachment:scroll;
   }
   nav{padding:0 16px;height:60px}
-  .mobile-menu{top:60px;padding:24px 20px}
+  .mobile-menu{top:60px;width:220px;padding:18px 20px 22px}
   .nav-logo{font-size:18px}
 
   .hero-content{padding:60px 16px 0}
@@ -1088,14 +1225,14 @@ footer{
   position: fixed; bottom: 28px; right: 28px; z-index: 9998;
   width: 62px; height: 62px; border-radius: 50%;
   background: #fff; border: none; cursor: pointer; padding: 0;
-  overflow: hidden; display: flex; align-items: center; justify-content: center;
+  overflow: visible; display: flex; align-items: center; justify-content: center;
   box-shadow: 0 8px 32px rgba(0,0,0,.45), 0 0 0 0 rgba(37,99,235,.4);
   transition: transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s;
   animation: sc-entry .7s 2.2s both;
 }
 @keyframes sc-entry { from { opacity:0; transform:scale(.5) translateY(20px) } to { opacity:1; transform:scale(1) translateY(0) } }
 #sc-btn:hover { transform: scale(1.1); box-shadow: 0 12px 48px rgba(0,0,0,.5), 0 0 0 8px rgba(37,99,235,.12); }
-#sc-btn img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+#sc-btn img { width:100%; height:100%; object-fit:cover; border-radius:50%; clip-path:circle(50%); }
 .sc-btn-ring {
   position: absolute; inset: -6px; border-radius: 50%;
   border: 2px solid rgba(37,99,235,.5);
@@ -1106,12 +1243,13 @@ footer{
 
 /* Notif badge */
 #sc-badge {
-  position: absolute; top: 2px; right: 2px;
-  width: 16px; height: 16px; border-radius: 50%;
+  position: absolute; top: -4px; right: -4px;
+  width: 18px; height: 18px; border-radius: 50%;
   background: #ef4444; border: 2px solid #050505;
   font-size: 9px; color: white; font-weight: 700;
   display: flex; align-items: center; justify-content: center;
   animation: sc-badge-in .4s .5s both;
+  z-index: 1;
 }
 @keyframes sc-badge-in { from { transform:scale(0) } to { transform:scale(1) } }
 
@@ -1469,7 +1607,7 @@ footer{
     leadCaliente: false, turno: 0,
     consignVehiculo:'', consignKm:'', consignEstado:''
   };
-  let fase = 'bienvenida'; // fases: bienvenida > nombre > celular > libre > consign_v > consign_km > consign_estado > final
+  let fase = 'consulta_inicial'; // fases: consulta_inicial > nombre > celular > libre > consign_v > consign_km > consign_estado > final
   let initiated = false;
   let isTyping  = false;
   let proactiveTimer, proactiveTimer2;
@@ -1637,8 +1775,8 @@ footer{
   async function bienvenida() {
     const hora = new Date().getHours();
     const saludo = hora < 12 ? '¡Buenos días!' : hora < 20 ? '¡Buenas tardes!' : '¡Buenas noches!';
-    await botSay(`${saludo} 👋 Bienvenido a <strong>Select Cars</strong>.<br><br>Soy tu concierge automotriz. Estoy acá para ayudarte a encontrar el vehículo perfecto, o lo que necesites: financiación, permuta, consignación…<br><br>¿Cómo te llamás?`, 1800);
-    fase = 'nombre';
+    await botSay(`${saludo} 👋 Bienvenido a <strong>Select Cars</strong>.<br><br>Soy tu concierge automotriz — estoy acá para ayudarte a encontrar tu próximo vehículo. Ya sea que busques una pickup, una SUV, un auto deportivo o eléctrico… tenemos algo para vos.<br><br>¿Qué estás buscando hoy?`, 1800);
+    fase = 'consulta_inicial';
   }
 
   // ── MOTOR DE RESPUESTAS ───────────────────────
@@ -1656,6 +1794,12 @@ footer{
     const nombre1 = mem.nombre ? mem.nombre.split(' ')[0] : '';
 
     // ── FASES LINEALES ────────────────────────
+    if (fase === 'consulta_inicial') {
+      fase = 'nombre';
+      await botSay(`Perfecto, con gusto te ayudo con eso 🙌<br><br>Antes, ¿cómo te llamás?`, 900);
+      return;
+    }
+
     if (fase === 'nombre') {
       mem.nombre = texto.trim();
       const n = mem.nombre.split(' ')[0];
@@ -1895,13 +2039,110 @@ footer{
 </nav>
 
 <!-- MOBILE MENU -->
+<div id="mob-backdrop" onclick="closeMob()" style="display:none;position:fixed;inset:0;z-index:998;background:rgba(0,0,0,.5);backdrop-filter:blur(2px);"></div>
 <div class="mobile-menu" id="mob">
   <a href="#vehicles" onclick="closeMob()">Vehículos</a>
-  <a href="#location" onclick="closeMob()">Ubicación</a>
+  <a href="#" onclick="closeMob();openUbicacion();return false;">Ubicación</a>
+  <a href="#contact-form" onclick="closeMob()">Hacer una consulta</a>
   <a href="#" onclick="closeMob();openSoldGallery();return false;">Unidades Vendidas</a>
   <a href="#" onclick="closeMob();openQuienesSomos();return false;">Quiénes Somos</a>
   <a href="#" onclick="closeMob();openFaq();return false;">Preguntas Frecuentes</a>
   <a href="https://wa.me/5492901606291?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo." target="_blank" rel="noopener" style="color:var(--blue)">WhatsApp →</a>
+</div>
+
+<!-- ═══ UBICACIÓN OVERLAY ═══ -->
+<div id="ub-overlay">
+  <div id="ub-box">
+    <div id="ub-header">
+      <div id="ub-title">
+        <span class="qs-lbl">JS Select Cars</span>
+        <span class="qs-h">Dónde Estamos</span>
+      </div>
+      <button id="ub-close" onclick="closeUbicacion()" aria-label="Cerrar">✕</button>
+    </div>
+    <div id="ub-content">
+
+      <div class="qs-hero">
+        <div class="qs-hero-tag">Ushuaia, Tierra del Fuego, Argentina</div>
+        <h2 class="qs-hero-title">Visitanos en el<br>fin del mundo.</h2>
+        <p class="qs-hero-sub">Estamos ubicados en el corazón de Ushuaia, la ciudad más austral del mundo. Nuestro local está abierto de lunes a sábado, con atención personalizada y sin turno previo.</p>
+      </div>
+
+      <div class="ub-info-grid">
+
+        <div class="ub-info-card">
+          <div class="ub-card-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="ub-card-body">
+            <div class="ub-card-label">Dirección</div>
+            <div class="ub-card-val">Gobernador Deloqui 1456</div>
+            <div class="ub-card-sub">Ushuaia, Tierra del Fuego, Argentina</div>
+            <a href="https://maps.google.com/?q=Gobernador+Deloqui+1456+Ushuaia+Tierra+del+Fuego" target="_blank" rel="noopener" class="ub-link">Ver en Google Maps →</a>
+          </div>
+        </div>
+
+        <div class="ub-info-card">
+          <div class="ub-card-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="ub-card-body">
+            <div class="ub-card-label">Horarios de atención</div>
+            <div class="ub-horario-row"><span>Lunes a Viernes</span><span class="ub-horario-val">9:00 – 19:00 hs</span></div>
+            <div class="ub-horario-row"><span>Sábados</span><span class="ub-horario-val">9:00 – 14:00 hs</span></div>
+            <div class="ub-horario-row"><span>Domingos</span><span class="ub-horario-val ub-cerrado">Cerrado</span></div>
+          </div>
+        </div>
+
+        <div class="ub-info-card">
+          <div class="ub-card-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.36 12a19.79 19.79 0 01-3.07-8.67A2 2 0 013.26 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div class="ub-card-body">
+            <div class="ub-card-label">WhatsApp</div>
+            <div class="ub-card-val">+54 9 2901 606291</div>
+            <div class="ub-card-sub">Respondemos en menos de 1 hora en horario comercial</div>
+            <a href="https://wa.me/5492901606291?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo." target="_blank" rel="noopener" class="ub-link">Escribirnos ahora →</a>
+          </div>
+        </div>
+
+        <div class="ub-info-card">
+          <div class="ub-card-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </div>
+          <div class="ub-card-body">
+            <div class="ub-card-label">Instagram</div>
+            <div class="ub-card-val">@js.selectcars</div>
+            <div class="ub-card-sub">Seguinos para ver novedades del stock y vehículos recién ingresados</div>
+            <a href="https://instagram.com/js.selectcars" target="_blank" rel="noopener" class="ub-link">Ver perfil →</a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="qs-divider"></div>
+
+      <div class="ub-map-block">
+        <div class="ub-map-label">Cómo llegar</div>
+        <div class="ub-map-box">
+          <div class="map-grid-bg"></div>
+          <div class="map-glow"></div>
+          <div class="map-center">
+            <svg class="map-pin-icon" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="var(--blue)"/></svg>
+            <div class="map-addr">Gobernador Deloqui 1456</div>
+            <div class="map-sub">Ushuaia, Tierra del Fuego, Argentina</div>
+          </div>
+          <a href="https://maps.google.com/?q=Gobernador+Deloqui+1456+Ushuaia+Tierra+del+Fuego" target="_blank" rel="noopener" class="open-map">Abrir en Maps →</a>
+        </div>
+      </div>
+
+      <a href="https://wa.me/5492901606291?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo." target="_blank" rel="noopener" class="qs-wa-btn">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contactarnos por WhatsApp
+      </a>
+
+    </div>
+  </div>
 </div>
 
 <!-- ═══ QUIÉNES SOMOS OVERLAY ═══ -->
@@ -2078,7 +2319,7 @@ footer{
             ¿Cómo me contacto con un asesor?
             <span class="faq-arrow">›</span>
           </button>
-          <div class="faq-a">La forma más rápida es por WhatsApp al +54 9 2901 606291. También podés usar el chat de esta página o visitarnos directamente en Ushuaia. Respondemos en minutos.</div>
+          <div class="faq-a">La forma más rápida es por WhatsApp al +54 9 2901 606291. También podés usar el chat de esta página o visitarnos directamente en Ushuaia. Respondemos en menos de 1 hora en horario comercial.</div>
         </div>
 
       </div>
@@ -2094,6 +2335,92 @@ footer{
 
 <style>
 /* ═══ QUIÉNES SOMOS & FAQ — ESTILOS COMPARTIDOS ═══ */
+#ub-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(5,5,5,.97);
+  backdrop-filter: blur(20px);
+  display: flex; align-items: flex-start; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+#ub-overlay.open { opacity: 1; pointer-events: all; }
+#ub-box { width: 100%; max-width: 760px; padding: 0 0 80px; min-height: 100%; }
+#ub-header {
+  position: sticky; top: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px 28px 18px;
+  background: rgba(5,5,5,.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+#ub-title { display: flex; flex-direction: column; gap: 2px; }
+#ub-close {
+  background: rgba(255,255,255,.07); border: none; color: var(--white);
+  width: 44px; height: 44px; border-radius: 50%; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s; flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+#ub-close:hover { background: rgba(255,255,255,.15); }
+#ub-content { padding: 0 28px; }
+
+/* Info grid */
+.ub-info-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px; margin: 40px 0;
+}
+.ub-info-card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 4px; padding: 24px;
+  display: flex; gap: 16px; align-items: flex-start;
+  transition: border-color .2s;
+}
+.ub-info-card:hover { border-color: rgba(37,99,235,.3); }
+.ub-card-icon {
+  flex-shrink: 0; margin-top: 2px;
+}
+.ub-card-icon svg {
+  width: 20px; height: 20px;
+  stroke: var(--blue); fill: none;
+  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+}
+.ub-card-body { display: flex; flex-direction: column; gap: 4px; }
+.ub-card-label {
+  font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--blue); margin-bottom: 6px; font-weight: 600;
+}
+.ub-card-val { font-size: 15px; font-weight: 400; color: var(--white); }
+.ub-card-sub { font-size: 12px; color: rgba(245,247,250,.45); line-height: 1.5; margin-top: 2px; }
+.ub-link {
+  font-size: 11px; letter-spacing: 1px; color: var(--blue);
+  text-decoration: none; margin-top: 10px; display: inline-block;
+  transition: opacity .2s;
+}
+.ub-link:hover { opacity: .7; }
+.ub-horario-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.05);
+  font-size: 13px; color: rgba(245,247,250,.6);
+}
+.ub-horario-row:last-child { border-bottom: none; }
+.ub-horario-val { color: var(--white); font-weight: 400; }
+.ub-cerrado { color: rgba(245,247,250,.3) !important; }
+.ub-map-label {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(245,247,250,.4); margin-bottom: 16px;
+}
+.ub-map-block { margin-bottom: 40px; }
+.ub-map-box {
+  position: relative; aspect-ratio: 16/6;
+  background: rgba(7,17,31,.7); border: 1px solid rgba(255,255,255,.07);
+  border-radius: 4px; overflow: hidden;
+}
+@media (max-width: 560px) {
+  .ub-info-grid { grid-template-columns: 1fr; }
+  #ub-content { padding: 0 20px; }
+}
+
 #qs-overlay {
   position: fixed; inset: 0; z-index: 10000;
   background: rgba(5,5,5,.88);
@@ -2298,6 +2625,65 @@ footer{
 </style>
 
 <script>
+// ── FORMULARIO CONSULTA ───────────────────────
+function cfTab(btn, form) {
+  document.querySelectorAll('.cf-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.cf-form').forEach(f => f.style.display = 'none');
+  document.getElementById('cf-' + form).style.display = 'flex';
+}
+
+function enviarConsulta(tipo) {
+  let msg = '';
+  if (tipo === 'compra') {
+    const nombre = document.getElementById('cb-nombre').value.trim();
+    const cel = document.getElementById('cb-cel').value.trim();
+    const tipoV = document.getElementById('cb-tipo').value;
+    const presup = document.getElementById('cb-presupuesto').value;
+    const permuta = document.querySelector('input[name="permuta"]:checked')?.value;
+    const nota = document.getElementById('cb-nota').value.trim();
+    if (!nombre || !cel) { alert('Por favor completá tu nombre y teléfono.'); return; }
+    msg = `Hola JS Select Cars! 👋\n\n🚗 *CONSULTA DE COMPRA*\n\n`;
+    msg += `Nombre: ${nombre}\nTeléfono: ${cel}\n`;
+    if (tipoV) msg += `Vehículo buscado: ${tipoV}\n`;
+    if (presup) msg += `Presupuesto: ${presup}\n`;
+    if (permuta) msg += `Permuta: ${permuta === 'si' ? 'Sí, tengo vehículo para permutar' : 'No, compra directa'}\n`;
+    if (nota) msg += `\nComentarios: ${nota}`;
+  } else {
+    const nombre = document.getElementById('cv-nombre').value.trim();
+    const cel = document.getElementById('cv-cel').value.trim();
+    const modelo = document.getElementById('cv-modelo').value.trim();
+    const anio = document.getElementById('cv-anio').value.trim();
+    const km = document.getElementById('cv-km').value.trim();
+    const modalidad = document.getElementById('cv-modalidad').value;
+    const nota = document.getElementById('cv-nota').value.trim();
+    if (!nombre || !cel) { alert('Por favor completá tu nombre y teléfono.'); return; }
+    if (!modelo) { alert('Por favor indicá el modelo del vehículo.'); return; }
+    msg = `Hola JS Select Cars! 👋\n\n💰 *CONSULTA DE VENTA*\n\n`;
+    msg += `Nombre: ${nombre}\nTeléfono: ${cel}\n`;
+    msg += `Vehículo: ${modelo}`;
+    if (anio) msg += ` (${anio})`;
+    msg += `\n`;
+    if (km) msg += `Kilometraje: ${km}\n`;
+    if (modalidad) msg += `Modalidad: ${modalidad}\n`;
+    if (nota) msg += `\nComentarios: ${nota}`;
+  }
+  window.open(`https://wa.me/5492901606291?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// ── UBICACIÓN ─────────────────────────────────
+function openUbicacion(){
+  document.getElementById('ub-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeUbicacion(){
+  document.getElementById('ub-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('ub-overlay').addEventListener('click', function(e){
+  if (e.target === this) closeUbicacion();
+});
+
 // ── QUIÉNES SOMOS ─────────────────────────────
 function openQuienesSomos(){
   document.getElementById('qs-overlay').classList.add('open');
@@ -3078,6 +3464,142 @@ self.addEventListener('fetch',e=>{
   </div>
 </div>
 
+<!-- ═══ FORMULARIO DE CONSULTA ═══ -->
+<section id="contact-form">
+  <div class="cf-inner rv">
+
+    <div class="cf-left">
+      <div class="sec-lbl" style="margin-bottom:18px">Hablemos</div>
+      <h2 class="cf-title">Tu próximo vehículo<br>empieza acá.</h2>
+      <p class="cf-sub">Completá el formulario y un asesor de JS Select Cars te contacta en menos de 1 hora. Sin compromiso, sin letra chica.</p>
+
+      <div class="cf-features">
+        <div class="cf-feat"><span class="cf-feat-dot"></span>Respuesta en menos de 1 hora</div>
+        <div class="cf-feat"><span class="cf-feat-dot"></span>Asesoramiento personalizado</div>
+        <div class="cf-feat"><span class="cf-feat-dot"></span>Financiación y permuta disponibles</div>
+        <div class="cf-feat"><span class="cf-feat-dot"></span>Sin presión de venta</div>
+      </div>
+
+      <div class="cf-divider"></div>
+
+      <div class="cf-contact-row">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.36 12a19.79 19.79 0 01-3.07-8.67A2 2 0 013.26 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        <span>¿Preferís escribirnos directo? <a href="https://wa.me/5492901606291?text=Hola!%20Quiero%20hacer%20una%20consulta." target="_blank" rel="noopener">WhatsApp →</a></span>
+      </div>
+    </div>
+
+    <div class="cf-right">
+      <div class="cf-card">
+        <!-- Tabs -->
+        <div class="cf-tabs">
+          <button class="cf-tab active" onclick="cfTab(this,'compra')">Quiero comprar</button>
+          <button class="cf-tab" onclick="cfTab(this,'venta')">Quiero vender</button>
+        </div>
+
+        <!-- Formulario compra -->
+        <div class="cf-form" id="cf-compra">
+          <div class="cf-field">
+            <label class="cf-label">Nombre completo <span class="cf-req">*</span></label>
+            <input class="cf-input" type="text" id="cb-nombre" placeholder="Juan García" autocomplete="name">
+          </div>
+          <div class="cf-field">
+            <label class="cf-label">WhatsApp / Teléfono <span class="cf-req">*</span></label>
+            <input class="cf-input" type="tel" id="cb-cel" placeholder="+54 9 2901 000-000" autocomplete="tel">
+          </div>
+          <div class="cf-field-row">
+            <div class="cf-field">
+              <label class="cf-label">Tipo de vehículo</label>
+              <select class="cf-input cf-select" id="cb-tipo">
+                <option value="">— Seleccioná —</option>
+                <option>SUV</option>
+                <option>Pickup</option>
+                <option>Sedán / Coupé</option>
+                <option>Eléctrico / Híbrido</option>
+                <option>Cualquiera</option>
+              </select>
+            </div>
+            <div class="cf-field">
+              <label class="cf-label">Presupuesto aprox.</label>
+              <select class="cf-input cf-select" id="cb-presupuesto">
+                <option value="">— Seleccioná —</option>
+                <option>Hasta USD 15.000</option>
+                <option>USD 15.000 – 30.000</option>
+                <option>USD 30.000 – 50.000</option>
+                <option>Más de USD 50.000</option>
+                <option>A definir</option>
+              </select>
+            </div>
+          </div>
+          <div class="cf-field">
+            <label class="cf-label">¿Tenés vehículo para permutar?</label>
+            <div class="cf-radio-group">
+              <label class="cf-radio"><input type="radio" name="permuta" value="si"> Sí, me interesa permutar</label>
+              <label class="cf-radio"><input type="radio" name="permuta" value="no" checked> No, compra directa</label>
+            </div>
+          </div>
+          <div class="cf-field">
+            <label class="cf-label">Comentarios adicionales</label>
+            <textarea class="cf-input cf-textarea" id="cb-nota" placeholder="Modelo específico, color, año, financiación…" rows="3"></textarea>
+          </div>
+          <button class="cf-submit" onclick="enviarConsulta('compra')">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.36 12a19.79 19.79 0 01-3.07-8.67A2 2 0 013.26 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            Enviar consulta por WhatsApp
+          </button>
+          <p class="cf-disclaimer">Al enviar, abrís WhatsApp con tu consulta lista. Respondemos en menos de 1 hora en horario comercial.</p>
+          </div>
+
+          <!-- Formulario venta -->
+          <div class="cf-form" id="cf-venta" style="display:none">
+          <div class="cf-field">
+            <label class="cf-label">Nombre completo <span class="cf-req">*</span></label>
+            <input class="cf-input" type="text" id="cv-nombre" placeholder="Juan García" autocomplete="name">
+          </div>
+          <div class="cf-field">
+            <label class="cf-label">WhatsApp / Teléfono <span class="cf-req">*</span></label>
+            <input class="cf-input" type="tel" id="cv-cel" placeholder="+54 9 2901 000-000" autocomplete="tel">
+          </div>
+          <div class="cf-field-row">
+            <div class="cf-field">
+              <label class="cf-label">Marca y modelo <span class="cf-req">*</span></label>
+              <input class="cf-input" type="text" id="cv-modelo" placeholder="Toyota Hilux, VW Vento…">
+            </div>
+            <div class="cf-field">
+              <label class="cf-label">Año</label>
+              <input class="cf-input" type="number" id="cv-anio" placeholder="2020" min="1990" max="2026">
+            </div>
+          </div>
+          <div class="cf-field-row">
+            <div class="cf-field">
+              <label class="cf-label">Kilometraje</label>
+              <input class="cf-input" type="text" id="cv-km" placeholder="85.000 km">
+            </div>
+            <div class="cf-field">
+              <label class="cf-label">Modalidad</label>
+              <select class="cf-input cf-select" id="cv-modalidad">
+                <option value="">— Seleccioná —</option>
+                <option>Venta directa</option>
+                <option>Consignación</option>
+                <option>Permuta por otro vehículo</option>
+              </select>
+            </div>
+          </div>
+          <div class="cf-field">
+            <label class="cf-label">Comentarios adicionales</label>
+            <textarea class="cf-input cf-textarea" id="cv-nota" placeholder="Estado general, equipamiento, precio esperado…" rows="3"></textarea>
+          </div>
+          <button class="cf-submit" onclick="enviarConsulta('venta')">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.36 12a19.79 19.79 0 01-3.07-8.67A2 2 0 013.26 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            Enviar consulta por WhatsApp
+          </button>
+          <p class="cf-disclaimer">Al enviar, abrís WhatsApp con tu consulta lista. Respondemos en menos de 1 hora en horario comercial.</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <!-- ═══ FOOTER ═══ -->
 <footer>
   <div class="foot-top">
@@ -3400,14 +3922,17 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 
 // ─── MOBILE MENU
 const ham=document.getElementById('ham'),mob=document.getElementById('mob');
+const mobBackdrop=document.getElementById('mob-backdrop');
 ham.addEventListener('click',()=>{
   const open=mob.classList.toggle('open');
   ham.classList.toggle('open',open);
+  mobBackdrop.style.display=open?'block':'none';
   document.body.style.overflow=open?'hidden':'';
 });
 function closeMob(){
   mob.classList.remove('open');
   ham.classList.remove('open');
+  mobBackdrop.style.display='none';
   document.body.style.overflow='';
 }
 
