@@ -205,7 +205,7 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
   background:radial-gradient(ellipse 70% 100% at 50% 100%,rgba(37,99,235,.18),transparent);
 }
 .hero-content{
-  position:relative;z-index:10;padding:0 80px;max-width:700px;
+  position:relative;z-index:10;padding:72px 80px 0;max-width:700px;
 }
 .hero-tag{
   font-size:11px;letter-spacing:4px;text-transform:uppercase;
@@ -341,7 +341,17 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
 .rv.in{opacity:1;transform:translateY(0)}
 
 /* ─── VEHICLES ──────────────────────────────────────────────── */
-#vehicles{background:var(--black)}
+#vehicles{background:var(--black);position:relative;}
+#vehicles::before{
+  content:'';position:absolute;inset:0;
+  background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/w_1600,f_auto,q_auto:low/v1779255628/IMG_6806_h6vxdd.jpg');
+  background-size:cover;background-position:center;
+  background-attachment:fixed;
+  opacity:.07;pointer-events:none;z-index:0;
+}
+#vehicles .sec-head,
+#vehicles .veh-grid,
+#vehicles>[style]{position:relative;z-index:1}
 .veh-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -508,6 +518,24 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
   display:flex;align-items:center;justify-content:center;
   min-height:320px;
   overflow:hidden;
+  position:relative;
+  touch-action:pan-y;
+  cursor:grab;
+}
+/* swipe hint for mobile */
+.vmodal-img::after{
+  content:'';
+  display:none;
+}
+@media(pointer:coarse){
+  .vmodal-img::after{
+    content:'‹ ›';
+    display:block;
+    position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+    font-size:18px;color:rgba(255,255,255,.45);letter-spacing:8px;
+    pointer-events:none;
+    text-shadow:0 1px 4px rgba(0,0,0,.5);
+  }
 }
 .vmodal-img img{
   width:100%;height:100%;
@@ -598,7 +626,16 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
 /* ─── WHY US ─────────────────────────────────────────────────── */
 #why{
   background:linear-gradient(180deg,var(--black) 0%,var(--navy) 100%);
+  position:relative;
 }
+#why::before{
+  content:'';position:absolute;inset:0;
+  background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/w_1600,f_auto,q_auto:low/v1779255740/IMG_6807_yuuobb.jpg');
+  background-size:cover;background-position:center;
+  background-attachment:fixed;
+  opacity:.06;pointer-events:none;z-index:0;
+}
+#why .sec-lbl,#why .sec-h2,#why .sec-p,#why .why-grid{position:relative;z-index:1}
 .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
 .wcard{
   padding:52px 44px;border:1px solid rgba(255,255,255,.06);
@@ -624,7 +661,15 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
 .wdesc{font-size:13px;font-weight:300;color:rgba(245,247,250,.48);line-height:1.85}
 
 /* ─── SERVICES ───────────────────────────────────────────────── */
-#services{background:var(--black)}
+#services{background:var(--black);position:relative;}
+#services::before{
+  content:'';position:absolute;inset:0;
+  background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/w_1600,f_auto,q_auto:low/v1779255740/IMG_6807_yuuobb.jpg');
+  background-size:cover;background-position:center;
+  background-attachment:fixed;
+  opacity:.06;pointer-events:none;z-index:0;
+}
+#services .sec-lbl,#services .sec-h2,#services .sec-p,#services .svc-grid{position:relative;z-index:1}
 .svc-grid{
   display:grid;grid-template-columns:repeat(6,1fr);
   border:1px solid rgba(255,255,255,.06);
@@ -662,7 +707,15 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
 }
 
 /* ─── TESTIMONIALS ───────────────────────────────────────────── */
-#testimonials{background:var(--navy);overflow:hidden;padding:128px 0}
+#testimonials{background:var(--navy);overflow:hidden;padding:128px 0;position:relative;}
+#testimonials::before{
+  content:'';position:absolute;inset:0;
+  background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/w_1600,f_auto,q_auto:low/v1779255650/IMG_6809_xpkgli.jpg');
+  background-size:cover;background-position:center;
+  background-attachment:fixed;
+  opacity:.07;pointer-events:none;z-index:0;
+}
+.test-head,.test-wrap{position:relative;z-index:1}
 .test-head{padding:0 80px;margin-bottom:64px}
 .test-wrap{position:relative}
 .test-wrap::before,.test-wrap::after{
@@ -670,7 +723,7 @@ nav.scrolled{background:rgba(5,5,5,.72);backdrop-filter:blur(22px);-webkit-backd
 }
 .test-wrap::before{left:0;background:linear-gradient(90deg,var(--navy),transparent)}
 .test-wrap::after{right:0;background:linear-gradient(-90deg,var(--navy),transparent)}
-.test-track{display:flex;gap:20px;animation:tSlide 36s linear infinite}
+.test-track{display:flex;gap:20px;animation:tSlide 10s linear infinite}
 .test-track:hover{animation-play-state:paused}
 @keyframes tSlide{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .tcard{
@@ -856,7 +909,7 @@ footer{
   .sec-p{margin-bottom:40px;font-size:15px}
   .sec-head{margin-bottom:40px;flex-direction:column;align-items:flex-start}
 
-  .hero-content{padding:0 20px;max-width:100%}
+  .hero-content{padding:64px 20px 0;max-width:100%}
   .hero-h1{font-size:clamp(52px,13vw,76px)}
   .hero-car{width:100%;right:-10%;opacity:.2}
   .scroll-hint{left:20px}
@@ -900,11 +953,15 @@ footer{
 
 /* ── MOBILE ── */
 @media(max-width:560px){
+  /* background-attachment:fixed broken on iOS/Android — use scroll */
+  #vehicles::before,#why::before,#services::before,#testimonials::before{
+    background-attachment:scroll;
+  }
   nav{padding:0 16px;height:60px}
   .mobile-menu{top:60px;padding:24px 20px}
   .nav-logo{font-size:18px}
 
-  .hero-content{padding:0 16px}
+  .hero-content{padding:60px 16px 0}
   .hero-h1{font-size:clamp(46px,14vw,68px);margin-bottom:20px}
   .hero-p{font-size:15px;margin-bottom:36px}
   .hero-tag{margin-bottom:20px}
@@ -1134,14 +1191,24 @@ footer{
 #sc-chat-send:hover{box-shadow:0 0 20px var(--blue-glow);transform:translateY(-1px)}
 
 @media(max-width:500px){
-  #sc-chat-box{
-    right:10px;left:10px;width:auto;
-    bottom:86px;
-    height:460px;
-    max-height:58vh;
-    border-radius:14px;
-  }
+  #sc-tooltip{right:10px;bottom:90px;font-size:12px}
   #sc-chat-btn{bottom:20px;right:16px;width:56px;height:56px}
+  /* Full-screen chat on mobile, js will adjust bottom dynamically */
+  #sc-chat-box{
+    right:0;left:0;width:100%;
+    bottom:0;
+    border-radius:16px 16px 0 0;
+    height:auto;
+    max-height:85dvh;
+    /* The box will be repositioned by JS when keyboard opens */
+  }
+}
+/* Mobile: floating button sits above send button inside chat */
+@media(max-width:500px){
+  #sc-chat-btn.chat-open{
+    /* hide the floating bubble when chat is open — it's redundant */
+    opacity:0;pointer-events:none;
+  }
 }
 #sc-chat-input{font-size:16px}
 </style>
@@ -1215,16 +1282,41 @@ footer{
       botMsg(`👋 Hola! Bienvenido a <b>JS Select Cars</b>.<br><br>Soy tu asesor virtual 🚘<br><br>Te puedo ayudar con:<br>• Compra de vehículos<br>• Permutas<br>• Financiación<br>• Disponibilidad y precios<br><br>¿Cómo te llamás?`);
       step = 'nombre';
     }
-    if(open) input.focus();
+    btn.classList.toggle('chat-open', open);
+    if(open) { input.focus(); updateChatPosition(); }
+    else { box.style.bottom = ''; box.style.height = ''; }
   };
 
   // Cerrar al click fuera del chat
   document.addEventListener('click', (e) => {
     if(box.classList.contains('open') && !box.contains(e.target) && !btn.contains(e.target)){
       box.classList.remove('open');
+      btn.classList.remove('chat-open');
+      box.style.bottom = '';
+      box.style.height = '';
     }
   });
   box.addEventListener('click', (e) => e.stopPropagation());
+
+  // ── Mobile: stick chat box to keyboard using visualViewport ──
+  function isMobile(){ return window.innerWidth <= 500; }
+
+  function updateChatPosition(){
+    if(!isMobile() || !box.classList.contains('open')) return;
+    const vv = window.visualViewport;
+    if(!vv) return;
+    // offsetTop = distance from top of layout viewport to top of visual viewport
+    const keyboardHeight = window.innerHeight - vv.height - vv.offsetTop;
+    const safeBottom = Math.max(keyboardHeight, 0);
+    box.style.bottom = safeBottom + 'px';
+    // height: visual viewport height minus a bit for the header feel
+    box.style.height = Math.min(vv.height * 0.88, 600) + 'px';
+  }
+
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', updateChatPosition);
+    window.visualViewport.addEventListener('scroll', updateChatPosition);
+  }
 
   function botMsg(html){
     const d = document.createElement('div');
@@ -1349,15 +1441,182 @@ footer{
   <a href="#why" onclick="closeMob()">Nosotros</a>
   <a href="#testimonials" onclick="closeMob()">Clientes</a>
   <a href="#location" onclick="closeMob()">Ubicación</a>
+  <a href="#" onclick="closeMob();openSoldGallery();return false;">Unidades Vendidas</a>
   <a href="https://wa.me/5492901000000?text=Hola!%20Quiero%20consultar%20sobre%20un%20veh%C3%ADculo." target="_blank" rel="noopener" style="color:var(--blue)">WhatsApp →</a>
 </div>
+
+<!-- ═══ UNIDADES VENDIDAS GALLERY OVERLAY ═══ -->
+<div id="sold-gallery-overlay">
+  <div id="sold-gallery-box">
+    <div id="sold-gallery-header">
+      <div id="sold-gallery-title">
+        <span class="sold-lbl">JS Select Cars</span>
+        <span class="sold-h">Unidades Vendidas</span>
+      </div>
+      <button id="sold-gallery-close" onclick="closeSoldGallery()" aria-label="Cerrar">✕</button>
+    </div>
+    <div id="sold-gallery-grid">
+      <div class="sold-img-wrap"><img src="https://res.cloudinary.com/dvvuwigmy/image/upload/w_800,f_auto,q_auto/v1779255649/IMG_6810_fivhec.jpg" alt="Unidad vendida" loading="lazy"></div>
+      <div class="sold-img-wrap"><img src="https://res.cloudinary.com/dvvuwigmy/image/upload/w_800,f_auto,q_auto/v1779255650/IMG_6811_ju0txj.jpg" alt="Unidad vendida" loading="lazy"></div>
+      <div class="sold-img-wrap"><img src="https://res.cloudinary.com/dvvuwigmy/image/upload/w_800,f_auto,q_auto/v1779255651/IMG_6814_jzrhtf.jpg" alt="Unidad vendida" loading="lazy"></div>
+      <div class="sold-img-wrap"><img src="https://res.cloudinary.com/dvvuwigmy/image/upload/w_800,f_auto,q_auto/v1779255652/IMG_6817_pcjn52.jpg" alt="Unidad vendida" loading="lazy"></div>
+      <div class="sold-img-wrap"><img src="https://res.cloudinary.com/dvvuwigmy/image/upload/w_800,f_auto,q_auto/v1779255652/IMG_6812_lgwngc.jpg" alt="Unidad vendida" loading="lazy"></div>
+      <div class="sold-img-wrap"><img src="https://res.cloudinary.com/dvvuwigmy/image/upload/w_800,f_auto,q_auto/v1779255653/IMG_6815_gb010y.jpg" alt="Unidad vendida" loading="lazy"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="sold-lightbox" onclick="closeLightbox()">
+  <img id="sold-lightbox-img" src="" alt="">
+  <button id="sold-lightbox-close" onclick="closeLightbox()">✕</button>
+</div>
+
+<style>
+/* ─── SOLD GALLERY OVERLAY ───────────────────────────────────── */
+#sold-gallery-overlay{
+  position:fixed;inset:0;z-index:10000;
+  background:rgba(5,5,5,.97);backdrop-filter:blur(20px);
+  display:flex;align-items:flex-start;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .35s;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+#sold-gallery-overlay.open{opacity:1;pointer-events:all}
+#sold-gallery-box{width:100%;max-width:900px;padding:0 0 60px;min-height:100%}
+#sold-gallery-header{
+  position:sticky;top:0;z-index:2;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:24px 28px 20px;
+  background:rgba(5,5,5,.93);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+#sold-gallery-title{display:flex;flex-direction:column;gap:2px}
+.sold-lbl{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--blue)}
+.sold-h{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--white);line-height:1}
+#sold-gallery-close{
+  background:rgba(255,255,255,.07);border:none;color:var(--white);
+  width:44px;height:44px;border-radius:50%;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s;flex-shrink:0;-webkit-tap-highlight-color:transparent;
+}
+#sold-gallery-close:hover{background:rgba(255,255,255,.15)}
+#sold-gallery-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:3px;padding:3px;
+}
+@media(min-width:600px){#sold-gallery-grid{grid-template-columns:repeat(3,1fr)}}
+.sold-img-wrap{
+  position:relative;overflow:hidden;aspect-ratio:4/3;
+  background:var(--navy2);cursor:pointer;
+}
+.sold-img-wrap img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform .5s var(--ease),opacity .4s;opacity:0;
+}
+.sold-img-wrap img.loaded{opacity:1}
+.sold-img-wrap:active img,.sold-img-wrap:hover img{transform:scale(1.05)}
+/* Lightbox */
+#sold-lightbox{
+  position:fixed;inset:0;z-index:10100;
+  background:rgba(0,0,0,.93);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s;padding:16px;
+}
+#sold-lightbox.open{opacity:1;pointer-events:all}
+#sold-lightbox img{
+  max-width:100%;max-height:100%;object-fit:contain;border-radius:3px;
+  transform:scale(.95);transition:transform .3s var(--ease);
+}
+#sold-lightbox.open img{transform:scale(1)}
+#sold-lightbox-close{
+  position:absolute;top:16px;right:16px;
+  background:rgba(255,255,255,.1);border:none;color:white;
+  width:44px;height:44px;border-radius:50%;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent;
+}
+</style>
+
+<script>
+function openSoldGallery(){
+  document.getElementById('sold-gallery-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  document.querySelectorAll('.sold-img-wrap img').forEach(img=>{
+    if(img.complete) img.classList.add('loaded');
+    else img.onload=()=>img.classList.add('loaded');
+  });
+}
+function closeSoldGallery(){
+  document.getElementById('sold-gallery-overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+function openLightbox(src){
+  document.getElementById('sold-lightbox-img').src=src;
+  document.getElementById('sold-lightbox').classList.add('open');
+}
+function closeLightbox(){
+  document.getElementById('sold-lightbox').classList.remove('open');
+}
+document.querySelectorAll('.sold-img-wrap').forEach(wrap=>{
+  wrap.addEventListener('click',()=>{
+    const src=wrap.querySelector('img').src.replace(/w_800/,'w_1600');
+    openLightbox(src);
+  });
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeLightbox();closeSoldGallery();}
+});
+</script>
 
 <!-- ═══ HERO ═══ -->
 <section id="hero">
   <!-- Video background -->
-  <video class="hero-video" autoplay muted loop playsinline>
-    <source src="https://res.cloudinary.com/dvvuwigmy/video/upload/v1779233217/insta_video_41932_cupqvk.mov" type="video/mp4">
+  <video
+    class="hero-video"
+    id="hero-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="none"
+    poster="https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_1280,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg"
+  >
+    <!-- WebM: ~40-60% smaller than MP4, served to Chrome/Firefox/Edge -->
+    <source
+      src="https://res.cloudinary.com/dvvuwigmy/video/upload/f_webm,vc_vp9,q_auto:low,w_1280,br_800k/v1779233217/insta_video_41932_cupqvk.webm"
+      type="video/webm"
+    >
+    <!-- MP4 H.264: fallback for Safari/iOS -->
+    <source
+      src="https://res.cloudinary.com/dvvuwigmy/video/upload/f_mp4,vc_h264,q_auto:low,w_1280,br_800k/v1779233217/insta_video_41932_cupqvk.mp4"
+      type="video/mp4"
+    >
   </video>
+  <script>
+  // Inicia el video en cuanto el hero es visible (no bloquea carga inicial)
+  (function(){
+    var vid = document.getElementById('hero-video');
+    if(!vid) return;
+    // En conexiones lentas o datos limitados, no reproducir
+    var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if(conn && (conn.saveData || conn.effectiveType === '2g')) return;
+    // IntersectionObserver: cargar solo cuando el hero está en viewport
+    if('IntersectionObserver' in window){
+      var io = new IntersectionObserver(function(entries){
+        if(entries[0].isIntersecting){
+          vid.load();
+          vid.play().catch(function(){});
+          io.disconnect();
+        }
+      }, {threshold: 0.01});
+      io.observe(vid);
+    } else {
+      vid.load();
+      vid.play().catch(function(){});
+    }
+  })();
+  </script>
   <div class="hero-video-overlay"></div>
 
   <div class="hero-bg">
@@ -1499,7 +1758,7 @@ footer{
     <div class="vcard rv" id="vcard-0">
       <div class="vcard-photo-col">
         <div class="vcard-photo" id="vcard-photo-0" style="background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236895/IMG_6793_deapou.jpg')"></div>
-        <span class="vcard-photo-badge">Destacado</span>
+        <span class="vcard-photo-badge">Nuevo ingreso</span>
         <button class="vcard-arrow prev" onclick="cardNav(event,0,-1)">&#8592;</button>
         <button class="vcard-arrow next" onclick="cardNav(event,0,1)">&#8594;</button>
         <div class="vcard-dots" id="vcard-dots-0"><div class="vcard-dot active" onclick="cardDot(event,0,0)"></div><div class="vcard-dot" onclick="cardDot(event,0,1)"></div><div class="vcard-dot" onclick="cardDot(event,0,2)"></div><div class="vcard-dot" onclick="cardDot(event,0,3)"></div><div class="vcard-dot" onclick="cardDot(event,0,4)"></div><div class="vcard-dot" onclick="cardDot(event,0,5)"></div><div class="vcard-dot" onclick="cardDot(event,0,6)"></div><div class="vcard-dot" onclick="cardDot(event,0,7)"></div><div class="vcard-dot" onclick="cardDot(event,0,8)"></div><div class="vcard-dot" onclick="cardDot(event,0,9)"></div></div>
@@ -1523,7 +1782,7 @@ footer{
     <div class="vcard rv" id="vcard-1">
       <div class="vcard-photo-col">
         <div class="vcard-photo" id="vcard-photo-1" style="background-image:url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236897/IMG_6740_zmuleb.jpg')"></div>
-        <span class="vcard-photo-badge">Nuevo ingreso</span>
+        <span class="vcard-photo-badge">Destacado</span>
         <button class="vcard-arrow prev" onclick="cardNav(event,1,-1)">&#8592;</button>
         <button class="vcard-arrow next" onclick="cardNav(event,1,1)">&#8594;</button>
         <div class="vcard-dots" id="vcard-dots-1"><div class="vcard-dot active" onclick="cardDot(event,1,0)"></div><div class="vcard-dot" onclick="cardDot(event,1,1)"></div><div class="vcard-dot" onclick="cardDot(event,1,2)"></div><div class="vcard-dot" onclick="cardDot(event,1,3)"></div><div class="vcard-dot" onclick="cardDot(event,1,4)"></div><div class="vcard-dot" onclick="cardDot(event,1,5)"></div><div class="vcard-dot" onclick="cardDot(event,1,6)"></div><div class="vcard-dot" onclick="cardDot(event,1,7)"></div><div class="vcard-dot" onclick="cardDot(event,1,8)"></div><div class="vcard-dot" onclick="cardDot(event,1,9)"></div></div>
@@ -1993,7 +2252,7 @@ window.addEventListener('scroll',()=>{
 // ─── VEHICLE DATA
 const vehicles = [
   {
-    badge:'Destacado',
+    badge:'Nuevo ingreso',
     name:'Toyota Hilux SRV',
     photo:'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236895/IMG_6793_deapou.jpg',
     gallery:[
@@ -2015,7 +2274,7 @@ const vehicles = [
     wa:'Hola!%20Me%20interesa%20la%20Toyota%20Hilux%20SRV%202024.%20%C2%BFPod%C3%A9s%20darme%20m%C3%A1s%20info%3F'
   },
   {
-    badge:'Nuevo ingreso',
+    badge:'Destacado',
     name:'BYD Shark',
     photo:'https://res.cloudinary.com/dvvuwigmy/image/upload/v1779236897/IMG_6740_zmuleb.jpg',
     gallery:[
@@ -2143,7 +2402,7 @@ function openModal(i){
   document.getElementById('vmodal-name').textContent=v.name;
   document.getElementById('vmodal-desc').textContent=v.desc;
   document.getElementById('vmodal-price').textContent=v.precio;
-  document.getElementById('vmodal-wa').href=`https://wa.me/5492901000000?text=${v.wa}`;
+  document.getElementById('vmodal-wa').href=`https://wa.me/5492901606291?text=${v.wa}`;
   document.getElementById('vmodal-specs').innerHTML=`
     <div class="vmodal-spec"><div class="vmodal-spec-label">Año</div><div class="vmodal-spec-val">${v.año}</div></div>
     <div class="vmodal-spec"><div class="vmodal-spec-label">Kilometraje</div><div class="vmodal-spec-val">${v.km}</div></div>
@@ -2164,23 +2423,55 @@ function openModal(i){
   const infoEl=document.querySelector('.vmodal-info');
   const oldGallery=infoEl.querySelector('.vmodal-gallery');
   if(oldGallery) oldGallery.remove();
-  if(v.gallery&&v.gallery.length>1){
-    const gal=document.createElement('div');
+
+  // Store gallery state on modal for swipe navigation
+  const gallery = (v.gallery && v.gallery.length) ? v.gallery : [v.photo];
+  let modalImgIdx = 0;
+  imgEl._gallery = gallery;
+  imgEl._idx = 0;
+
+  function setModalImg(idx){
+    modalImgIdx = (idx + gallery.length) % gallery.length;
+    imgEl._idx = modalImgIdx;
+    imgEl.src = gallery[modalImgIdx];
+    if(gal) {
+      gal.querySelectorAll('.vmodal-thumb').forEach((x,i)=>x.classList.toggle('active', i===modalImgIdx));
+    }
+  }
+
+  let gal = null;
+  if(gallery.length>1){
+    gal=document.createElement('div');
     gal.className='vmodal-gallery';
-    v.gallery.forEach((src,idx)=>{
+    gallery.forEach((src,idx)=>{
       const t=document.createElement('div');
       t.className='vmodal-thumb'+(idx===0?' active':'');
       t.style.backgroundImage=`url('${src}')`;
-      t.onclick=()=>{
-        imgEl.src=src;
-        gal.querySelectorAll('.vmodal-thumb').forEach(x=>x.classList.remove('active'));
-        t.classList.add('active');
-      };
+      t.onclick=()=>setModalImg(idx);
       gal.appendChild(t);
     });
-    // insert before badge
     infoEl.insertBefore(gal,infoEl.firstChild);
   }
+
+  // Swipe on the main image
+  const imgWrap = document.getElementById('vmodal-img');
+  let _sx=0, _sy=0;
+  imgWrap._touchstart = e => { _sx=e.touches[0].clientX; _sy=e.touches[0].clientY; };
+  imgWrap._touchend = e => {
+    const dx=e.changedTouches[0].clientX-_sx;
+    const dy=Math.abs(e.changedTouches[0].clientY-_sy);
+    if(Math.abs(dx)>40 && dy<60){
+      e.stopPropagation();
+      setModalImg(imgEl._idx + (dx<0?1:-1));
+    }
+  };
+  imgWrap.removeEventListener('touchstart', imgWrap._prevTouchStart);
+  imgWrap.removeEventListener('touchend', imgWrap._prevTouchEnd);
+  imgWrap.addEventListener('touchstart', imgWrap._touchstart, {passive:true});
+  imgWrap.addEventListener('touchend', imgWrap._touchend, {passive:false});
+  imgWrap._prevTouchStart = imgWrap._touchstart;
+  imgWrap._prevTouchEnd = imgWrap._touchend;
+
   document.getElementById('vmodal').classList.add('open');
   document.body.style.overflow='hidden';
 }
