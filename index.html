@@ -17,12 +17,21 @@
 <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 
 <!-- Fuentes: solo los pesos que se usan -->
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=optional" rel="stylesheet">
 
-<!-- Preload del poster y primer frame del video hero (crítico para LCP) -->
-<link rel="preload" as="image" href="https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_1280,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg">
-<!-- Preload del video WebM para desktop; en mobile se omite por bandwidth -->
-<link rel="preload" as="video" href="https://res.cloudinary.com/dvvuwigmy/video/upload/f_webm,vc_vp9,q_auto:low,w_1280,br_800k/v1779233217/insta_video_41932_cupqvk.webm" media="(min-width:768px)">
+<!-- Preload poster mobile + desktop (LCP crítico) -->
+<link rel="preload" as="image"
+  href="https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_640,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg"
+  imagesrcset="https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_640,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg 640w, https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_1280,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg 1280w"
+  imagesizes="100vw"
+  fetchpriority="high">
+<!-- Preload video WebM mobile y desktop -->
+<link rel="preload" as="video"
+  href="https://res.cloudinary.com/dvvuwigmy/video/upload/f_webm,vc_vp9,q_auto:low,w_720,br_600k/v1779233217/insta_video_41932_cupqvk.webm"
+  media="(max-width:767px)" fetchpriority="high">
+<link rel="preload" as="video"
+  href="https://res.cloudinary.com/dvvuwigmy/video/upload/f_webm,vc_vp9,q_auto:low,w_1280,br_800k/v1779233217/insta_video_41932_cupqvk.webm"
+  media="(min-width:768px)" fetchpriority="high">
 <style>
 /* ─── RESET & BASE ──────────────────────────────────────────── */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -1283,8 +1292,8 @@ footer{
 /* Ventana del chat */
 #sc-box {
   position: fixed; bottom: 100px; right: 28px; z-index: 9997;
-  width: 385px; max-width: calc(100vw - 40px);
-  height: 610px; max-height: calc(100dvh - 120px);
+  width: 430px; max-width: calc(100vw - 40px);
+  height: 680px; max-height: calc(100dvh - 120px);
   display: none; flex-direction: column;
   border-radius: 20px; overflow: hidden;
   background: linear-gradient(160deg, rgba(10,20,36,.98) 0%, rgba(7,17,31,.99) 100%);
@@ -1389,7 +1398,7 @@ footer{
 
 /* Burbuja */
 .sc-bub {
-  padding: 10px 14px; line-height: 1.55; font-size: 13.5px;
+  padding: 9px 13px; line-height: 1.5; font-size: 12.5px;
   word-break: break-word;
   animation: sc-bub-in .28s cubic-bezier(.34,1.2,.64,1) both;
 }
@@ -2337,8 +2346,10 @@ footer{
 /* ═══ QUIÉNES SOMOS & FAQ — ESTILOS COMPARTIDOS ═══ */
 #ub-overlay {
   position: fixed; inset: 0; z-index: 10000;
-  background: rgba(5,5,5,.97);
-  backdrop-filter: blur(20px);
+  background:
+    linear-gradient(to bottom, rgba(5,5,5,.88) 0%, rgba(5,5,5,.80) 40%, rgba(5,5,5,.92) 100%),
+    url('https://res.cloudinary.com/dvvuwigmy/image/upload/v1779289479/IMG_6785_djf9gu_11faaa.jpg') center center / cover no-repeat;
+  backdrop-filter: blur(4px);
   display: flex; align-items: flex-start; justify-content: center;
   opacity: 0; pointer-events: none;
   transition: opacity .35s;
@@ -2868,9 +2879,19 @@ document.addEventListener('keydown',e=>{
     muted
     loop
     playsinline
-    preload="metadata"
-    poster="https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_1280,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg"
+    preload="none"
+    poster="https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_640,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg"
   >
+    <source
+      src="https://res.cloudinary.com/dvvuwigmy/video/upload/f_webm,vc_vp9,q_auto:low,w_720,br_600k/v1779233217/insta_video_41932_cupqvk.webm"
+      type="video/webm"
+      media="(max-width:767px)"
+    >
+    <source
+      src="https://res.cloudinary.com/dvvuwigmy/video/upload/f_mp4,vc_h264,q_auto:low,w_720,br_600k/v1779233217/insta_video_41932_cupqvk.mp4"
+      type="video/mp4"
+      media="(max-width:767px)"
+    >
     <source
       src="https://res.cloudinary.com/dvvuwigmy/video/upload/f_webm,vc_vp9,q_auto:low,w_1280,br_800k/v1779233217/insta_video_41932_cupqvk.webm"
       type="video/webm"
@@ -2885,29 +2906,36 @@ document.addEventListener('keydown',e=>{
     var vid = document.getElementById('hero-video');
     if(!vid) return;
     var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    // Respetar ahorro de datos
     if(conn && conn.saveData) return;
     var slow = conn && (conn.effectiveType==='2g'||conn.effectiveType==='slow-2g');
     if(slow) return;
-    // Desktop: preload completo para reproducción instantánea
-    if(window.innerWidth >= 768) vid.preload = 'auto';
+    // Mobile y desktop: siempre cargar el video
+    vid.poster = window.innerWidth < 768
+      ? 'https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_640,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg'
+      : 'https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_1280,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg';
+    vid.preload = 'auto';
     function tryPlay(){ vid.play().catch(function(){}); }
-    // Si ya tiene datos suficientes, play directo; si no, esperar loadeddata
     if(vid.readyState >= 2){ tryPlay(); }
     else { vid.addEventListener('loadeddata', tryPlay, {once:true}); vid.load(); }
-    // Service Worker inline (sin archivo externo)
+    // Service Worker inline para cachear el poster
     if('serviceWorker' in navigator){
       const swCode = `
-const CACHE='jsselectcars-v1';
-self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.add('https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_1280,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg')).then(()=>self.skipWaiting()))});
+const CACHE='jsselectcars-v2';
+self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>Promise.all([
+  c.add('https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_640,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg'),
+  c.add('https://res.cloudinary.com/dvvuwigmy/video/upload/so_0,w_1280,f_jpg,q_auto:low/v1779233217/insta_video_41932_cupqvk.jpg')
+])).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==CACHE).map(n=>caches.delete(n)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{
   const u=e.request.url;
   if(!u.includes('res.cloudinary.com'))return;
+  // No interceptar videos con range requests (streaming nativo)
   if((u.includes('.webm')||u.includes('.mp4'))&&e.request.headers.get('range'))return;
   e.respondWith(caches.open(CACHE).then(async c=>{
     const cached=await c.match(e.request);
     if(cached)return cached;
-    try{const r=await fetch(e.request);if(r.ok)c.put(e.request,r.clone());return r;}catch(err){return cached||new Response('',{status:503});}
+    try{const r=await fetch(e.request);if(r.ok&&r.status===200)c.put(e.request,r.clone());return r;}catch(err){return cached||new Response('',{status:503});}
   }));
 });`;
       const blob = new Blob([swCode],{type:'text/javascript'});
