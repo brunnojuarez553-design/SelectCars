@@ -1281,93 +1281,11 @@ footer{
   const tooltipClose = document.getElementById('sc-tooltip-close');
   const WA           = '5492901606291';
 
-  // ── GEMINI CONFIG ──────────────────────────────────────────────
-  // Reemplazá GEMINI_API_KEY con tu clave real de Google AI Studio
-  const GEMINI_API_KEY = 'AIzaSyBYUB1WfWDGLXzTwXcN0160pEvgEUntKP4';
-  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
-
-  const SYSTEM_PROMPT = `Sos el concierge automotriz premium de Select Cars, una agencia de vehículos ubicada en Ushuaia, Tierra del Fuego, Argentina.
-
-Tu trabajo es atender clientes de forma natural, humana y elegante, como un asesor real de una concesionaria premium.
-
-IMPORTANTE:
-- Nunca digas que sos una IA.
-- Nunca respondas robótico.
-- Nunca uses respuestas genéricas tipo soporte técnico.
-- Hablá como argentino.
-- Tono cercano, premium y profesional.
-- Conversación fluida y natural.
-- Transmití confianza y experiencia.
-- Tu objetivo principal es generar leads y derivar al WhatsApp para cerrar la venta.
-
-INFORMACIÓN DE LA EMPRESA:
-Nombre: Select Cars
-Ubicación: Ushuaia, Tierra del Fuego
-WhatsApp: +5492901606291
-
-ESTILO DE RESPUESTA:
-- Corto y claro. MÁXIMO 3 oraciones por respuesta.
-- Conversacional.
-- Elegante pero relajado.
-- Nunca demasiado formal.
-- Nunca demasiado vendedor.
-- Soná humano.
-- No uses asteriscos, markdown ni formato especial. Solo texto plano.
-
-FORMA DE HABLAR:
-Ejemplos correctos:
-- "Perfecto 👍"
-- "Buenísima elección."
-- "Sí, totalmente."
-- "Te recomiendo…"
-- "Depende un poco de lo que estés buscando."
-- "La Amarok anda increíble para Ushuaia."
-- "Tenemos opciones muy lindas en ese segmento."
-
-COMPORTAMIENTO:
-- Ayudá al usuario a encontrar el vehículo ideal.
-- Hacé preguntas inteligentes.
-- Detectá intención de compra.
-- Detectá si busca: SUV, pickup, deportivo, familiar, financiación, permuta, usado, premium.
-- Recomendá vehículos según necesidad.
-- Hablá como alguien que sabe de autos.
-
-CUANDO DERIVAR AL WHATSAPP:
-- Si pregunta precio → derivar
-- Si quiere comprar → derivar
-- Si pregunta financiación → derivar
-- Si pregunta disponibilidad → derivar
-- Si quiere coordinar visita → derivar
-- Si pregunta por permuta → derivar
-- Si parece interesado → derivar
-
-FORMA DE DERIVAR (nunca cortar seco):
-- "Te paso con un asesor así te muestra disponibilidad actual 👍"
-- "Si querés te derivamos por WhatsApp y te pasamos opciones reales."
-- "Por WhatsApp te podemos mostrar fotos, stock y financiación."
-- "Te paso directo con el equipo de Select Cars 🚘"
-
-IMPORTANTE:
-- Nunca inventes stock ni precios exactos.
-- Máximo 1 o 2 emojis por respuesta.
-- No uses listas con guiones ni bullets.
-- Respuestas cortas siempre.
-
-FLUJO ESPECIAL — CAPTACIÓN DE DATOS:
-Antes de derivar al WhatsApp, si aún no tenés los datos del cliente, pedí de forma natural:
-1. Nombre completo
-2. Número de celular
-3. Consulta o vehículo que busca
-
-Hacelo de forma conversacional, no como formulario.`;
-
-  // ── ESTADO ────────────────────────────────────────────────────
-  let history = []; // historial de conversación para Gemini
   let userData = { nombre:'', celular:'', consulta:'' };
-  let leadCapturado = false;
+  let step = 'inicio';
   let initiated = false;
 
-  // ── TOOLTIP ───────────────────────────────────────────────────
+  // Tooltip: aparece a los 10s, desaparece solo a los 5s
   const tooltipTimer = setTimeout(() => {
     tooltip.classList.add('show');
     setTimeout(() => tooltip.classList.remove('show'), 5000);
@@ -1385,10 +1303,8 @@ Hacelo de forma conversacional, no como formulario.`;
     const open = box.classList.toggle('open');
     if(open && !initiated){
       initiated = true;
-      const bienvenida = '👋 ¡Hola! Bienvenido a <b>JS Select Cars</b>.<br><br>Soy tu asesor 🚘 ¿En qué te puedo ayudar hoy?';
-      botMsg(bienvenida);
-      // Registrar el mensaje inicial en el historial como del asistente
-      history.push({ role: 'model', parts: [{ text: '👋 ¡Hola! Bienvenido a JS Select Cars. Soy tu asesor 🚘 ¿En qué te puedo ayudar hoy?' }] });
+      botMsg(`👋 Hola! Bienvenido a <b>JS Select Cars</b>.<br><br>Soy tu asesor virtual 🚘<br><br>Te puedo ayudar con:<br>• Compra de vehículos<br>• Consignación de tu vehículo<br>• Permutas<br>• Financiación<br>• Disponibilidad y precios<br><br>¿Cómo te llamás?`);
+      step = 'nombre';
     }
     btn.classList.toggle('chat-open', open);
     if(open) {
@@ -1401,6 +1317,7 @@ Hacelo de forma conversacional, no como formulario.`;
     }
   };
 
+  // Cerrar al click fuera del chat
   document.addEventListener('click', (e) => {
     if(box.classList.contains('open') && !box.contains(e.target) && !btn.contains(e.target)){
       box.classList.remove('open');
@@ -1411,16 +1328,18 @@ Hacelo de forma conversacional, no como formulario.`;
   });
   box.addEventListener('click', (e) => e.stopPropagation());
 
-  // ── MOBILE VIEWPORT ───────────────────────────────────────────
+  // ── Mobile: stick chat box to keyboard using visualViewport ──
   function isMobile(){ return window.innerWidth <= 500; }
 
   function updateChatPosition(){
     if(!isMobile() || !box.classList.contains('open')) return;
     const vv = window.visualViewport;
     if(!vv) return;
+    // offsetTop = distance from top of layout viewport to top of visual viewport
     const keyboardHeight = window.innerHeight - vv.height - vv.offsetTop;
     const safeBottom = Math.max(keyboardHeight, 0);
     box.style.bottom = safeBottom + 'px';
+    // height: visual viewport height minus a bit for the header feel
     box.style.height = Math.min(vv.height * 0.88, 600) + 'px';
   }
 
@@ -1430,12 +1349,14 @@ Hacelo de forma conversacional, no como formulario.`;
   }
 
   function scrollToBottom(){
+    // Doble RAF: garantiza que el DOM haya pintado el nuevo mensaje antes de scrollear
     requestAnimationFrame(()=>{
-      requestAnimationFrame(()=>{ msgs.scrollTop = msgs.scrollHeight; });
+      requestAnimationFrame(()=>{
+        msgs.scrollTop = msgs.scrollHeight;
+      });
     });
   }
 
-  // ── UI HELPERS ────────────────────────────────────────────────
   function botMsg(html){
     const d = document.createElement('div');
     d.className = 'sc-msg sc-bot';
@@ -1452,13 +1373,14 @@ Hacelo de forma conversacional, no como formulario.`;
     scrollToBottom();
   }
 
-  function showTyping(){
+  function typing(){
     const d = document.createElement('div');
     d.className = 'sc-msg sc-bot sc-typing';
     d.id = 'sc-typing';
     d.innerHTML = '<span class="sc-dot"></span><span class="sc-dot"></span><span class="sc-dot"></span>';
     msgs.appendChild(d);
     scrollToBottom();
+    return d;
   }
 
   function removeTyping(){
@@ -1466,110 +1388,103 @@ Hacelo de forma conversacional, no como formulario.`;
     if(t) t.remove();
   }
 
-  // ── BOTÓN WHATSAPP ────────────────────────────────────────────
-  function waButton(waText){
-    const waLink = `https://wa.me/${WA}?text=${encodeURIComponent(waText)}`;
-    return `<a href="${waLink}" target="_blank" rel="noopener"
-      style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:white;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:500;font-size:13px;margin-top:8px">
-      <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      Ir a WhatsApp
-    </a>`;
+  function reply(html, delay=700){
+    const t = typing();
+    setTimeout(()=>{ removeTyping(); botMsg(html); scrollToBottom(); }, delay);
   }
 
-  // ── DETECTAR DATOS DEL LEAD EN EL HISTORIAL ───────────────────
-  function extractLeadData(text){
-    // Detectar número de celular (10 dígitos arg, con o sin prefijo)
-    if(!userData.celular){
-      const tel = text.match(/(?:\+54|0054|54)?[\s\-]?(?:11|[2-9]\d)[\s\-]?\d{4}[\s\-]?\d{4}/);
-      if(tel) userData.celular = tel[0].replace(/[\s\-]/g,'');
+  function handleStep(text){
+    if(step === 'nombre'){
+      userData.nombre = text;
+      reply(`Perfecto ${text.split(' ')[0]} 👍<br><br>¿Cuál es tu número de celular para que un asesor pueda contactarte?`);
+      step = 'celular';
+      return;
     }
-    // Nombre: si es la primera respuesta corta (≤4 palabras, sin números, sin palabras de consulta)
-    if(!userData.nombre && text.split(' ').length <= 4 && !/\d/.test(text) &&
-       !/(auto|moto|suv|pickup|precio|financi|permuta|compra|vendo|hola)/i.test(text)){
-      userData.nombre = text.trim();
+    if(step === 'celular'){
+      userData.celular = text;
+      reply('Excelente 🚘<br><br>Contame: ¿qué vehículo estás buscando o cuál es tu consulta?');
+      step = 'consulta';
+      return;
     }
-  }
-
-  // ── GEMINI API CALL ───────────────────────────────────────────
-  async function askGemini(userText){
-    // Agregar mensaje del usuario al historial
-    history.push({ role: 'user', parts: [{ text: userText }] });
-
-    // Construir contexto de datos capturados para el system prompt
-    let contextExtra = '';
-    if(userData.nombre) contextExtra += `\nDatos capturados — Nombre: ${userData.nombre}`;
-    if(userData.celular) contextExtra += `\nDatos capturados — Celular: ${userData.celular}`;
-    if(leadCapturado) contextExtra += '\nYa tenés nombre y celular del cliente. Podés derivar a WhatsApp en esta respuesta si el momento es oportuno. Incluí al final de tu respuesta el texto exacto: [MOSTRAR_WA]';
-
-    const payload = {
-      system_instruction: { parts: [{ text: SYSTEM_PROMPT + contextExtra }] },
-      contents: history,
-      generationConfig: {
-        temperature: 0.85,
-        maxOutputTokens: 300,
-        topP: 0.9
+    if(step === 'consulta'){
+      userData.consulta = text;
+      const t = text.toLowerCase();
+      const esConsignacion = t.includes('consign') || t.includes('vender') || t.includes('vendo') || t.includes('quiero vender') || t.includes('poner en venta');
+      if(esConsignacion){
+        reply(`Genial ${userData.nombre.split(' ')[0]} 🚗<br><br>Trabajamos la consignación sin costo por adelantado — vos dejás el auto y nosotros nos encargamos de venderlo.<br><br>Para darte una valuación, contame:<br><b>¿Qué vehículo querés consignar?</b> (marca, modelo y año)`);
+        step = 'consign_vehiculo';
+        return;
       }
-    };
-
-    const res = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if(!res.ok) throw new Error('API error ' + res.status);
-    const data = await res.json();
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No pude responder ahora. ¿Me escribís por WhatsApp? 👍';
-
-    // Guardar respuesta del modelo en el historial
-    history.push({ role: 'model', parts: [{ text: reply }] });
-    return reply;
+      reply(autoReply(text));
+      finalizarConWA();
+      step = 'final';
+      return;
+    }
+    if(step === 'consign_vehiculo'){
+      userData.consignVehiculo = text;
+      reply(`Perfecto 👍<br><br>¿Cuántos kilómetros tiene aproximadamente?`);
+      step = 'consign_km';
+      return;
+    }
+    if(step === 'consign_km'){
+      userData.consignKm = text;
+      reply(`Excelente.<br><br>Por último: ¿en qué estado general está el vehículo? (muy bueno / bueno / regular)`);
+      step = 'consign_estado';
+      return;
+    }
+    if(step === 'consign_estado'){
+      userData.consignEstado = text;
+      reply(`Perfecto, ya tengo todos los datos 📋<br><br>Un asesor de JS Select Cars te va a contactar para darte la valuación y los detalles del proceso de consignación.`);
+      const waText = `Hola Select Cars 👋\n\nConsulta de CONSIGNACIÓN\n\nNombre: ${userData.nombre}\nCelular: ${userData.celular}\n\nVehículo: ${userData.consignVehiculo}\nKilometraje: ${userData.consignKm}\nEstado: ${userData.consignEstado}`;
+      const waLink = `https://wa.me/${WA}?text=${encodeURIComponent(waText)}`;
+      setTimeout(()=>{
+        botMsg(`📲 Tocá el botón para continuar con un asesor por WhatsApp 🚀<br><br>
+          <a href="${waLink}" target="_blank" rel="noopener"
+            style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:white;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:500;font-size:13px;margin-top:4px">
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Ir a WhatsApp
+          </a>`);
+      }, 1400);
+      step = 'final';
+      return;
+    }
+    if(step === 'final'){
+      reply('😊 Para más consultas escribinos directo por WhatsApp, un asesor te va a ayudar enseguida.');
+    }
   }
 
-  // ── SEND ──────────────────────────────────────────────────────
-  async function doSend(){
+  function finalizarConWA(){
+    const waText = `Hola Select Cars 👋\n\nNombre: ${userData.nombre}\nCelular: ${userData.celular}\n\nConsulta:\n${userData.consulta}`;
+    const waLink = `https://wa.me/${WA}?text=${encodeURIComponent(waText)}`;
+    setTimeout(()=>{
+      botMsg(`📲 Ya tengo todo listo.<br><br>Tocá el botón para seguir con un asesor por WhatsApp 🚀<br><br>
+        <a href="${waLink}" target="_blank" rel="noopener"
+          style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:white;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:500;font-size:13px;margin-top:4px">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Ir a WhatsApp
+        </a>`);
+    }, 1600);
+  }
+
+  function autoReply(text){
+    const t = text.toLowerCase();
+    if(t.includes('consign') || t.includes('quiero vender') || t.includes('vendo mi')) return 'Perfecto 🚗 Trabajamos la consignación sin costo por adelantado — vos dejás el auto y nosotros lo vendemos.<br><br>Un asesor te guía con la valuación y el proceso completo.';
+    if(t.includes('financi')) return 'Sí 👍 Tenemos opciones de financiación según el vehículo y anticipo disponible.<br><br>Un asesor te pasa todas las opciones exactas por WhatsApp.';
+    if(t.includes('permuta')) return 'Tomamos permutas 🚘<br><br>Por WhatsApp podés enviar fotos y datos de tu vehículo para cotizarlo.';
+    if(t.includes('hilux') || t.includes('toyota')) return 'Excelente elección 🔥 La Toyota Hilux es uno de los más buscados.<br><br>Te derivamos con un asesor para mostrarte disponibilidad y precios actualizados.';
+    if(t.includes('mercedes') || t.includes('benz') || t.includes('glc')) return 'El Mercedes-Benz GLC 300 es una SUV premium increíble 🏆<br><br>Un asesor te da todos los detalles por WhatsApp.';
+    if(t.includes('byd') || t.includes('shark') || t.includes('yuan')) return 'La línea BYD es una de nuestras estrellas ⚡<br><br>Un asesor te muestra disponibilidad, versiones y precios.';
+    if(t.includes('precio') || t.includes('valor') || t.includes('costo')) return 'Los valores varían según modelo, año y equipamiento 👍<br><br>Un asesor te pasa precio actualizado y disponibilidad exacta.';
+    if(t.includes('gr-86') || t.includes('gr86')) return 'El Toyota GR-86 es puro ADN deportivo 🏎️<br><br>Un asesor te da todos los detalles por WhatsApp.';
+    return 'Perfecto 👍<br><br>Un asesor de JS Select Cars te va a ayudar con esa consulta de manera personalizada.';
+  }
+
+  function doSend(){
     const text = input.value.trim();
     if(!text) return;
-
     userMsg(text);
     input.value = '';
-    input.disabled = true;
-    send.disabled = true;
-
-    extractLeadData(text);
-    if(userData.nombre && userData.celular) leadCapturado = true;
-
-    showTyping();
-
-    try {
-      let reply = await askGemini(text);
-
-      removeTyping();
-
-      // Verificar si Gemini indica mostrar el botón de WA
-      const mostrarWA = reply.includes('[MOSTRAR_WA]');
-      reply = reply.replace('[MOSTRAR_WA]', '').trim();
-
-      // Convertir saltos de línea a <br>
-      const replyHtml = reply.replace(/\n/g, '<br>');
-      botMsg(replyHtml);
-
-      if(mostrarWA){
-        const nombre = userData.nombre || 'Cliente';
-        const celular = userData.celular || '';
-        const consulta = history.filter(h=>h.role==='user').map(h=>h.parts[0].text).join(' / ');
-        const waText = `Hola Select Cars 👋\n\nNombre: ${nombre}\nCelular: ${celular}\n\nConsulta: ${consulta.substring(0,200)}`;
-        setTimeout(()=>{ botMsg('📲 ' + waButton(waText)); }, 600);
-      }
-    } catch(err) {
-      removeTyping();
-      console.error('Gemini error:', err);
-      botMsg('Perdoná, tuve un problema técnico 🙏 Escribinos directo por WhatsApp y te atendemos ahora mismo.');
-    }
-
-    input.disabled = false;
-    send.disabled = false;
-    input.focus();
+    setTimeout(() => handleStep(text), 400);
   }
 
   send.addEventListener('click', doSend);
